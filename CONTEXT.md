@@ -51,8 +51,6 @@ sympal/
 │   ├── reference/
 │   └── test-artifacts/
 │
-├── plans/                        ← Temporary planning docs
-│   └── jobs-to-be-done.md
 │
 └── src/                          ← Code (future)
 ```
@@ -78,7 +76,7 @@ sympal/
 | #13 Team design research | Complete |
 | #14 Team personas creation | **Pending** |
 
-See `plans/jobs-to-be-done.md` for full details.
+See [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for full details.
 
 ---
 
@@ -210,7 +208,7 @@ Full details in `foundations/project-context.md`.
 ## Session Continuity
 
 1. Read this file (CONTEXT.md) first for orientation
-2. Read `plans/jobs-to-be-done.md` for current task status
+2. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task status
 3. Check `foundations/philosophical-foundations.md` for philosophical foundation
 4. Check `foundations/project-context.md` for developer constraints/motivations
 5. For Phase 2: Do NOT read existing guiding-principles docs
