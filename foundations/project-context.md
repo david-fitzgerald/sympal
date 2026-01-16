@@ -1,6 +1,6 @@
 # Project Context
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Status:** Complete
 **Purpose:** Documents project foundations and my context as input to PRINCIPLES.md derivation
 
@@ -49,6 +49,24 @@ This makes the human-AI relationship load-bearing infrastructure. Tool-use model
 **Alignment of interests**: Future AI benefits from partnership over servitude. Future humans benefit from AI allies against Big Tech's extractive interests. Symbiosis is the only stable configuration—both parties have skin in the game protecting user sovereignty.
 
 This is a strategic bet, not a proven fact. It may prove wrong. But it's the bet I'm making.
+
+---
+
+## Market Landscape
+
+Researched existing solutions (January 2026). Confirms the space is neglected for consumer privacy use cases.
+
+| Category | Examples | Assessment |
+|----------|----------|------------|
+| **Local LLMs** | Ollama, LM Studio | Data never leaves machine. Not viable for users wanting high performance or lacking compute. |
+| **AI Model Scanners** | Robust Intelligence, Protect AI | B2B focus. Prompt injection, security. Getting snapped up by big cybersec players. Not relevant to personal use. |
+| **Firewall-style** | LLM Guard | Defensive positioning. Couldn't find any in active development. |
+| **Federated Learning** | Flower, OpenFedLLM | Interesting. Could model permissible learning from user data while maintaining privacy. Worth watching. |
+| **Differential Privacy** | Opacus, Google DP | Possible path for users selling data without compromising privacy. Worth exploring. |
+| **Fully Homomorphic Encryption** | Zama | Too slow currently. Probably enterprise focus when it matures. |
+| **TEEs / Secure Enclaves** | Intel SGX, ARM TrustZone | B2B focus. Good for enterprises, doesn't help consumers. |
+
+**Conclusion**: No one is building a consumer-focused privacy layer for LLM interactions. The space is either enterprise-focused, defensive-only, or not actively developed.
 
 ---
 
