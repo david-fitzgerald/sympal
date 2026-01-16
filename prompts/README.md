@@ -81,6 +81,105 @@ See `reference/testing-patterns.md` for two-phase testing:
 
 ---
 
+## Vero Review Workflow
+
+Vero Certus reviews foundational documents before they're considered final. This catches Meridian-style errors (coherent but systematically wrong) that team deliberation may miss.
+
+### When to Invoke Vero
+
+| Trigger | Example |
+|---------|---------|
+| Before ratifying a new foundational doc | PRINCIPLES.md initial ratification |
+| After significant revision to a foundational doc | principles-discussion.md adding trigger conditions |
+| Before a doc becomes sole input for derivative work | philosophical-foundations.md before PRINCIPLES.md derivation |
+
+**Foundational docs**: PRINCIPLES.md, philosophical-foundations.md, project-context.md, principles-discussion.md
+
+### Issue Template
+
+```markdown
+## Task
+Have Vero Certus review `[document]` before considering it final.
+
+## Context
+- Current version: vX.Y.Z
+- After review: bump to vX.Y+1.0
+- [Why this review matters]
+
+## Acceptance Criteria
+- [ ] Load Vero-Certus-v1.1.md as reviewer
+- [ ] Review [document] against Vero's rubric
+- [ ] Persist review to `foundations/reviews/vero-review-[document]-vX.Y.Z.md`
+- [ ] Address any findings
+- [ ] Bump version to vX.Y+1.0
+- [ ] Update version history in document
+```
+
+### Review Process
+
+```
+1. Load Persona     Read Vero-Certus-v1.1.md, adopt persona fully
+        │
+        ▼
+2. Conduct Review   Follow 5-phase protocol:
+        │           - Phase 1: Purpose Alignment
+        │           - Phase 2: Internal Consistency
+        │           - Phase 3: Implementation Verification
+        │           - Phase 4: Downstream Readiness
+        │           - Phase 5: Meridian Risk Assessment
+        │
+        ▼
+3. Persist Review   Write to foundations/reviews/vero-review-[doc]-v[X.Y.Z].md
+        │           (Use output contract from persona)
+        │
+        ▼
+4. Address Findings Fix BLOCKING/MAJOR findings in source document
+        │           MINOR findings: fix or note for future
+        │
+        ▼
+5. Version Bump     Source doc: increment minor version
+        │           Update version history with review reference
+        │
+        ▼
+6. Commit           Single commit with all changes
+                    Reference closes #[issue] in message
+```
+
+### File Naming
+
+| Artifact | Pattern | Example |
+|----------|---------|---------|
+| Review file | `vero-review-[document]-v[X.Y.Z].md` | `vero-review-PRINCIPLES-v1.0.0.md` |
+| Location | `foundations/reviews/` | |
+
+### Severity Responses
+
+| Severity | Action | Version Impact |
+|----------|--------|----------------|
+| BLOCKING | Must fix before SHIP | Review again after fix |
+| MAJOR | Should fix; SHIP possible with documented risk | Fix → minor bump |
+| MINOR | Note for future; proceed | Optional fix |
+
+### Example Commit
+
+```
+foundations: Vero review of [document]
+
+[Summary of findings and fixes]
+
+Reviews persisted:
+- vero-review-[document]-vX.Y.Z.md
+
+Versions bumped:
+- [document]: vX.Y.Z → vX.Y+1.0
+
+Closes #[issue]
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+---
+
 ## Workflow for SymPAL Teams
 
 ```
@@ -174,4 +273,4 @@ Based on `research/team-design-best-practices.md`:
 
 - **Solas-Venn:** v3.0.1
 - **Vero Certus:** v1.1
-- **Last Updated:** 2026-01-15
+- **Last Updated:** 2026-01-17
