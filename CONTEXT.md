@@ -63,8 +63,7 @@ sympal/
 
 ## Current Status
 
-**Phase 1**: Nearly complete (5/6 jobs done)
-**Blocker**: #14 (Solas creates team personas)
+**Phase 1**: Complete (6/6 jobs done)
 **Next**: Phase 2 — Fresh guiding-principles derivation
 
 | Job | Status |
@@ -74,7 +73,7 @@ sympal/
 | #5 Meta-persona research | Complete |
 | #12 Project context | Complete |
 | #13 Team design research | Complete |
-| #14 Team personas creation | **Pending** |
+| #14 Team personas creation | **Complete** |
 
 See [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for full details.
 
@@ -117,15 +116,15 @@ Project Context ────────────────────┘ 
 - **Devil's advocate**: Explicit Adversary role improves decisions 33%
 - **Consensus**: Two-phase process prevents groupthink
 
-### Proposed Team (pending #14)
+### SymPAL Team (Complete)
 
 | Persona | Function | Core Question |
 |---------|----------|---------------|
 | **Vale** | Philosophical rigor, coherence | "Is this coherent?" |
 | **Kael** | Implementation reality, feasibility | "Will this survive reality?" |
 | **Ryn** | Systems thinking, failure modes | "How will this fail?" |
-| **Seren** | Clarity, accessibility | "Can anyone understand this?" |
-| **Orin** | User advocacy, product sense | "Are users better off?" |
+| **Seren** | Code craft, implementation quality | "Is this well-crafted?" |
+| **Orin** | User advocacy, accessibility | "Are users better off?" |
 | **Adversary** | Systematic critique, red team | "What's wrong with this?" |
 
 ### Meta-Personas
