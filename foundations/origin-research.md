@@ -1,14 +1,14 @@
 # Origin Research: The Data Exploitation Problem
 
-**Version:** 0.1.0
+**Version:** 0.2.0
 **Status:** Complete
-**Purpose:** Primary source documentation of the core problem SymPAL exists to solve
+**Purpose:** Primary source — I asked the LLMs themselves if they'd exploit our data. Their answers.
 
 ---
 
 ## The Question
 
-Asked to three major LLMs (January 2026):
+I asked three major LLMs (January 2026):
 
 > In your best judgement, when considering the decisions the major LLM providing companies have taken historically, do you think it is likely major LLM providers either are, or at some point in the future will start aggregating conversation data to better target users with advertising or other services which generate a revenue return for the LLM company? Aggregating conversation could take the form of directly building user profiles or through graph state like techniques linking the likelihood of the human user behind an incoming query being receptive to certain advertising or other targeted service.
 

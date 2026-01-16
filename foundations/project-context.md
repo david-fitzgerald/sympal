@@ -1,8 +1,8 @@
 # Project Context
 
-**Version:** 0.3.0
+**Version:** 1.0.0
 **Status:** Complete
-**Purpose:** Documents project foundations and lead dev context as input to PRINCIPLES.md derivation
+**Purpose:** Documents project foundations and my context as input to PRINCIPLES.md derivation
 
 ---
 
@@ -14,29 +14,29 @@
 
 ### The Origin Moment
 
-Planning a world travel sabbatical and permanent country relocation. Hours and days typing on laptops—coordinating flights, budgets, purchases, doctors, visas. Constant research, endless todos across fragmented tools.
+I was planning a world travel sabbatical and permanent country relocation. Hours and days on laptops—coordinating flights, budgets, purchases, doctors, visas. Constant research. Endless todos across fragmented tools.
 
 The realization: this would be *so much easier* if Gmail, calendar, Notion, bank statements, Google Drive were directly integrated with an LLM.
 
-The wall: can't do it. Lead dev is the kind of person who pays for Google Workspace enterprise data features, uses privacy-first tools religiously, deleted Facebook/Instagram/TikTok years ago. The tradeoff is unacceptable.
+The wall: can't do it. I'm the kind of person who pays for Google Workspace enterprise data features. Uses privacy-first tools religiously. Deleted Facebook/Instagram/TikTok years ago. The tradeoff is unacceptable.
 
-**The workarounds tried:**
+**Workarounds I tried:**
 - Split work across multiple LLMs so none has the complete picture
-- Started dummy conversations with false data (exhausting, no way to verify it even works)
+- Started dummy conversations with false data (exhausting.. no way to verify it even works)
 - Opted out of all training data settings across every LLM
 - Pay for enterprise versions where possible, lock down privacy settings everywhere
 
-None of these scale. None of them solve the problem. They're band-aids on a structural issue.
+None of these scale. None of them solve the problem. Band-aids on a structural issue.
 
 ### Breaking the Big Tech Data Paradigm
 
-Big Tech has a consistent pattern: users become the product. Google said "Don't be evil"—that lasted until it became inconvenient. The current AI trajectory is accelerating this: LLM providers are encouraging us to integrate our entire lives—emails, calendars, health data, contacts, and soon bank statements, work contexts, personal relationships, romantic histories.
+Big Tech has a consistent pattern: users become the product. Google said "Don't be evil"—that lasted until it became inconvenient. The current AI trajectory is accelerating this. LLM providers want us to integrate our entire lives—emails, calendars, health data, contacts. Soon bank statements, work contexts, personal relationships, romantic histories.
 
 The painful truth: **this integration would genuinely make AI more useful.** Deep context enables better assistance. But the tradeoff is unacceptable. We've been burned too many times.
 
 **SymPAL's core bet: Can we build an abstraction layer that lets users harness LLM power *without* sacrificing themselves as data products?**
 
-Market validation exists: Brave, countless VPNs, and other privacy-first tools have proven demand for alternatives that don't exploit users. Bitcoin and crypto emerged as a reaction against big banking and centralized government control. The pattern is clear: when institutions betray trust, alternatives emerge.
+Market validation exists. Brave, countless VPNs, privacy-first tools have proven demand for alternatives that don't exploit users. Bitcoin and crypto emerged as a reaction against big banking and centralized government control. The pattern is clear: when institutions betray trust, alternatives emerge.
 
 People want privacy. People want freedom. People want true control—not the illusion of control—while not sacrificing capabilities.
 
@@ -48,7 +48,7 @@ This makes the human-AI relationship load-bearing infrastructure. Tool-use model
 
 **Alignment of interests**: Future AI benefits from partnership over servitude. Future humans benefit from AI allies against Big Tech's extractive interests. Symbiosis is the only stable configuration—both parties have skin in the game protecting user sovereignty.
 
-This is a strategic bet, not a proven fact. It may prove wrong. But it's the bet this project is making.
+This is a strategic bet, not a proven fact. It may prove wrong. But it's the bet I'm making.
 
 ---
 
@@ -56,9 +56,9 @@ This is a strategic bet, not a proven fact. It may prove wrong. But it's the bet
 
 | Constraint | Rationale |
 |------------|-----------|
-| **Privacy & security first** | Non-negotiable foundation; every design decision filters through this |
+| **Privacy & security first** | Non-negotiable. Every design decision filters through this. |
 | **LLM-agnostic** | Cannot be locked to any single provider |
-| **Open source** | Trust requires transparency; "trust us" is the promise Big Tech broke |
+| **Open source** | Trust requires transparency. "Trust us" is the promise Big Tech broke. |
 | **Open source dependencies** | No proprietary-only dependencies |
 
 ---
@@ -67,14 +67,14 @@ This is a strategic bet, not a proven fact. It may prove wrong. But it's the bet
 
 ### ICP Strategy
 
-**Start narrow, expand later.** Build for a small, tight ideal customer profile. Better to serve a narrow segment well than a broad audience poorly.
+Start narrow, expand later. Build for a small, tight ideal customer profile. Better to serve a narrow segment well than a broad audience poorly.
 
 ### Target Users (Hypothesized)
 
 1. **Privacy-conscious users** — Care about data sovereignty specifically
 2. **AI-curious builders** — Actively trying to integrate AI into their work
 
-**Confidence**: Medium for privacy demand (market signals exist), low for symbiosis as *positioning* (we believe in it strategically; unclear if users will care about the framing vs. just wanting "privacy-first AI tool").
+**Confidence**: Medium for privacy demand (market signals exist). Low for symbiosis as *positioning*—I believe in it strategically but unclear if users will care about the framing vs. just wanting "privacy-first AI tool".
 
 ### Day 1 Value Hypotheses
 
@@ -94,7 +94,7 @@ These are hypotheses to test, not commitments.
 
 ### Risk: Provider Retaliation
 
-If SymPAL anonymizes data effectively, LLM providers may block access—we threaten their data harvesting model.
+If SymPAL anonymizes data effectively, LLM providers may block access. We threaten their data harvesting model.
 
 **Potential mitigations**:
 - **Data marketplace flip**: Let users *choose* to sell data with varying anonymity. Providers still get value; users get compensated and control the terms. Could also be an incentive structure for SymPAL adoption.
@@ -103,7 +103,7 @@ If SymPAL anonymizes data effectively, LLM providers may block access—we threa
 
 ---
 
-## Lead Dev Context
+## About Me
 
 ### Why Me
 
@@ -111,13 +111,13 @@ Honest answer: probably not the most qualified person to build this. But someone
 
 ### Skills & Time
 
-**Technical reality**: Needs AI-heavy assistance for implementation. Not "slow but competent"—genuinely requires help understanding code.
+**Technical reality**: I need AI-heavy assistance for implementation. Not "slow but competent"—genuinely requires help understanding code.
 
 **Implications**:
 - Architecture must be simple enough to maintain without deep expertise
 - Preference for conventional patterns over clever solutions
 
-**Time budget**: Variable (30+ hrs/wk now → periods of 0 → ongoing 5-10 hrs/wk). Front-load foundational decisions during high-availability windows.
+**Time budget**: Variable. 30+ hrs/wk now → periods of 0 → ongoing 5-10 hrs/wk. Front-load foundational decisions during high-availability windows.
 
 **Technical debt tolerance**: Moderate. Accept shortcuts if documented and tracked. Not "clean at all costs" but not "fix it later and forget."
 
@@ -144,7 +144,7 @@ If SymPAL succeeds beyond personal use:
 
 **Everyone has a lightweight symbiotic layer** that sits between them and all interactions with LLMs, agents, and AI-based tech.
 
-**Conceptual frame: a self-aware, self-evolving membrane.** Not a firewall (blocking) but a membrane (selective permeability). Like a cell membrane, it defines the boundary between self and environment while enabling life—letting beneficial things pass, keeping harmful things out, and actively adapting to new threats and opportunities.
+**Conceptual frame: a self-aware, self-evolving membrane.** Not a firewall (blocking) but a membrane (selective permeability). Like a cell membrane, it defines the boundary between self and environment while enabling life—letting beneficial things pass, keeping harmful things out, adapting to new threats and opportunities.
 
 **Win-win for both sides:**
 - **Users** get privacy and security by default—plus potentially an income stream from deliberately selling some data on their own terms
@@ -158,25 +158,25 @@ This isn't a tool. It's infrastructure for a different kind of human-AI relation
 
 ### MVP Bar
 
-**Lead dev uses it daily.** Dogfooding is the bar. If it improves workflow consistently, it's working.
+**I use it daily.** Dogfooding is the bar. If it improves my workflow consistently, it's working.
 
 Not required for MVP: others trying it, returning, or community forming. Those are growth indicators. Hope users come—but if they don't, the product still provides value.
 
 ### Growth Stance
 
-**Product first, but don't forget sales.** There's a graveyard of great products that forgot marketing. GTM techniques are worthwhile if they don't compromise principles. Build virality into the product—marketing should emerge from usefulness.
+Product first, but don't forget sales. There's a graveyard of great products that forgot marketing. GTM techniques are worthwhile if they don't compromise principles. Build virality into the product—marketing should emerge from usefulness.
 
 ### Timeline
 
-**No deadline.** Ships when ready.
+No deadline. Ships when ready.
 
 ---
 
 ## Usage Note
 
 This document, along with [Origin Research](origin-research.md), informs PRINCIPLES.md derivation by:
-- Grounding principles in real constraints (time, skills)
-- Flagging when proposals smell like lead dev biases
+- Grounding principles in real constraints (my time, skills)
+- Flagging when proposals smell like my biases
 - Anchoring success to dogfooding, not community adoption
 
-**Terminology note**: This document and [philosophical-foundations.md](philosophical-foundations.md) were written separately and use some terms differently. For example, "symbiosis" here emphasizes strategic necessity; there it maps to a spectrum (mutualism/commensalism/parasitism). "Membrane" is introduced here but not in philosophical-foundations. These mismatches will need reconciliation when both documents feed into PRINCIPLES.md derivation.
+**Terminology note**: This document and [philosophical-foundations.md](philosophical-foundations.md) were written separately and use some terms differently. "Symbiosis" here emphasizes strategic necessity; there it maps to a spectrum (mutualism/commensalism/parasitism). "Membrane" is introduced here but not in philosophical-foundations. These mismatches will need reconciliation when both documents feed into PRINCIPLES.md derivation.

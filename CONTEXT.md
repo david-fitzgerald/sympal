@@ -164,6 +164,23 @@ Maintain the "Version History" section at the end of foundational docs. Update i
 - Change 2
 ```
 
+### Voice & Style
+
+Documents in this project use different voice registers:
+
+| Document | Voice | Notes |
+|----------|-------|-------|
+| project-context.md | Personal | Lead dev perspective, colloquial ok |
+| README | Personal | Project owner speaking to readers |
+| origin-research.md | Personal | Framing is personal; quotes verbatim |
+| philosophical-foundations.md | Project | Formal, rigorous, peer-reviewed |
+| PRINCIPLES.md | Project | Derived by personas, ratified |
+| Persona outputs (Vero reviews, etc.) | Persona | Defined by persona prompt |
+
+**Personal voice**: See global CLAUDE.md `## Writing Voice` — direct, fragments ok, "I" heavy
+**Project voice**: Formal, structured, rigorous — informed by personal preferences but more polished for external/community audience
+**Persona voice**: Follow persona prompt specifications
+
 ### Reviews
 
 When conducting persona reviews (Vero, peer reviews, etc.) on foundational documents:
