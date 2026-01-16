@@ -114,17 +114,104 @@ How well did the reviewer follow its own protocol?
 
 ---
 
-## Testing Workflow
+## Complete Workflow
 
-### New Persona
+### End-to-End Process
 
 ```
-1. Solas CREATE → persona v1.0
-2. Phase A: Solas VERIFY → findings
-3. Fix issues → persona v1.1
-4. Phase B: Test artifact → detection + quality scores
-5. Document in [persona-folder]/test-results.md
-6. Pass? → Deploy. Fail? → Iterate.
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PERSONA CREATION WORKFLOW                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Step 1: CREATE
+│
+├─→ Solas CREATE protocol
+├─→ Output: persona v1.0 with its own scoring rubric
+└─→ Each persona gets a rubric tailored to its domain
+
+Step 2: VERIFY (Phase A)
+│
+├─→ Solas VERIFY protocol (12-point structural rubric)
+├─→ Check: capability operationalization, error architecture, boundaries, etc.
+├─→ If findings:
+│   ├─→ Fix HIGH/MEDIUM issues
+│   ├─→ Bump version (patch)
+│   └─→ Re-verify if major changes
+└─→ Pass: 12/12 for HIGH stakes
+
+Step 3: CAPABILITY TEST (Phase B)
+│
+├─→ Claude creates deliberately flawed test artifact
+│   ├─→ Document expected score (e.g., "7/10")
+│   ├─→ Document planted flaws with expected detection
+│   └─→ Store in /test-artifacts/
+│
+├─→ Load persona as system prompt
+├─→ Persona reviews test artifact
+├─→ Compare persona's score vs expected score
+│   ├─→ MATCH: PASS — persona detects what it claims to detect
+│   └─→ MISMATCH: FAIL
+│       ├─→ Solas reviews persona for gaps
+│       ├─→ Fix persona, bump version
+│       ├─→ Create new test artifact
+│       └─→ Repeat until pass
+│
+└─→ Document results in [persona-folder]/test-results-[X].md
+
+Step 4: TEAM VERIFY (for persona teams)
+│
+├─→ Solas VERIFY at team level
+├─→ Check: coverage matrix, blind spot analysis, dynamics
+├─→ Identify gaps (e.g., "no one owns security")
+├─→ If gaps:
+│   ├─→ Expand existing persona scope, OR
+│   └─→ Create new persona
+└─→ Document in solas-team-verify.md
+
+Step 5: HUMAN REVIEW
+│
+├─→ Lead dev reviews all prompts
+├─→ Ask clarifying questions
+├─→ If gaps revealed:
+│   ├─→ Solas implements fix
+│   └─→ Re-run relevant tests (Phase A/B)
+└─→ Sign-off for production
+
+Step 6: DEPLOY
+│
+└─→ Personas are production ready
+```
+
+### Key Insight: Expected Score Matching
+
+The capability test works because:
+1. Test artifact documents **expected score** before testing
+2. Planted flaws are mapped to rubric dimensions
+3. If persona scores differently than expected, something is wrong:
+   - **Persona scores lower**: Missing capability (blind spot)
+   - **Persona scores higher**: False positives or rubric miscalibration
+
+Example from Vale test:
+```
+Test artifact: vale-test-A.md
+Expected: 7/10 (3 flaws planted across 5 dimensions)
+Actual:   7/10
+Result:   PASS — Vale detects exactly what we designed it to detect
+```
+
+---
+
+## Workflow Variants
+
+### New Persona (Individual)
+
+```
+1. Solas CREATE → persona v1.0 with rubric
+2. Phase A: Solas VERIFY → 12/12
+3. Phase B: Flawed test → score match
+4. Document results
+5. Human review
+6. Deploy
 ```
 
 ### Patching Existing Persona
@@ -133,8 +220,18 @@ How well did the reviewer follow its own protocol?
 1. Document gap in CHANGELOG
 2. Apply fix → version bump
 3. Phase A: Solas VERIFY (regression)
-4. Phase B: Re-run capability test
+4. Phase B: Re-run capability test (may need new test artifact)
 5. Update test-results.md
+```
+
+### Stress Testing (Post-Deploy)
+
+```
+1. Present edge cases to team
+2. Identify coverage gaps (e.g., "who owns privacy?")
+3. Expand persona scope or create new persona
+4. Run Phase A + Phase B on expanded/new personas
+5. Update team verify
 ```
 
 ### Cross-Model Comparison
@@ -226,4 +323,4 @@ Plant flaws matching the reviewer's protocol phases:
 
 ---
 
-*Last updated: 2026-01-15*
+*Last updated: 2026-01-16*
