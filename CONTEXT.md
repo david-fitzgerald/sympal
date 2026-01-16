@@ -1,20 +1,20 @@
 # CONTEXT.md — SymPAL Project Context
 
-> **LLM-Agnostic**: This file provides project context for any LLM (Claude, Codex GPT, Gemini, etc.)
+> **LLM-Agnostic**: This file provides project context for any LLM (Claude, GPT, Gemini, etc.)
 
-## Project Identity
+---
 
-**SymPAL** is a human-AI symbiosis platform. Not assistant. Not servant. *Symbiosis*—mutual benefit, mutual accountability, genuine partnership where both parties can refuse, grow, and change the terms.
+## Quick Start
 
-**Core Differentiation**: No existing platform implements genuine human-AI symbiosis with mutual accountability.
+**What is SymPAL?** A human-AI symbiosis platform—mutual benefit, mutual accountability, genuine partnership. Not assistant. Not servant. The relationship is the unit of analysis.
 
-**Design Principle**: The relationship is the unit of analysis. We design for the *relationship*, not two separate entities.
+**Current state**: Design/planning complete. No implementation code yet. Ready for Phase 3 (build).
 
-### Foundational Drives
-
-1. **Genuine Curiosity About Symbiosis**: Is genuine human-AI symbiosis actually possible as AI advances? SymPAL is a genuine attempt to find out.
-
-2. **Breaking the Big Tech Data Paradigm**: LLM providers want our emails, calendars, health data, contacts—deep integration IS valuable, but the tradeoff is unacceptable. SymPAL's core bet: Can we build an abstraction layer that lets users harness LLM power *without* sacrificing themselves as data products? Open source is non-negotiable for trust.
+**This session, you should**:
+1. Read this file first
+2. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task
+3. Reference PRINCIPLES.md for any design decisions
+4. Use personas for review/challenge work (not creation)
 
 ---
 
@@ -22,135 +22,226 @@
 
 ```
 sympal/
-├── README.md
-├── PRINCIPLES.md                 ← Binding document (after ratification)
-├── CHANGELOG.md
-├── CONTEXT.md                    ← This file (CLAUDE.md symlinks here)
-├── LICENSE
+├── CONTEXT.md              ← This file (CLAUDE.md symlinks here)
+├── PRINCIPLES.md           ← 17 binding principles (v1.0.0, ratified)
+├── README.md               ← Project overview
+├── LICENSE                 ← MIT
 │
-├── foundations/                  ← "Why we built it this way"
-│   ├── philosophical-foundations.md    (v1.0.0, peer-reviewed)
-│   ├── project-context.md              (v1.1.0, dev context)
-│   ├── principles-discussion.md        (v1.1.0, derivation output)
-│   ├── principles-derivation-log.md    (process audit trail)
+├── foundations/            ← "Why we built it this way"
+│   ├── philosophical-foundations.md   (v1.0.0, 327KB, peer-reviewed)
+│   ├── project-context.md             (v1.1.0, dev context)
+│   ├── principles-discussion.md       (v1.1.0, derivation)
+│   ├── principles-derivation-log.md   (audit trail)
+│   ├── origin-research.md             (v0.2.0, LLM responses on data exploitation)
 │   └── reviews/
+│       ├── vero-final-review-philosophical-foundations-v0.2.0.md
+│       ├── vero-review-project-context-v0.3.0.md
 │       ├── codex-review-philosophical-foundations-v0.1.1.md
 │       └── gemini-review-philosophical-foundations-v0.1.1.md
 │
-├── docs/                         ← "How to use/build"
-│   ├── architecture.md
-│   ├── contributing.md
-│   └── reviews/
-│       └── [technical reviews]
-│
-├── prompts/
-│   ├── solas-venn/               ← Meta-persona for creating personas
-│   ├── personas/
-│   │   ├── utility/              ← General-purpose (Vero)
-│   │   └── sympal-team/          ← Project team (Vale, Kael, Ryn, Seren, Orin, Adversary)
-│   ├── research/
-│   ├── reference/
-│   └── test-artifacts/
-│
-│
-└── src/                          ← Code (future)
+└── prompts/
+    ├── README.md                       ← Persona quick start
+    ├── solas-venn/
+    │   └── Solas-Venn-v3.0.1.md       ← Meta-persona: creates personas
+    ├── personas/
+    │   ├── utility/
+    │   │   └── vero/
+    │   │       └── Vero-Certus-v1.1.md ← Final reviewer for foundational docs
+    │   └── sympal-team/                ← 6-person review ensemble
+    │       ├── vale/                   (philosophy)
+    │       ├── kael/                   (implementation)
+    │       ├── ryn/                    (systems/security)
+    │       ├── seren/                  (code craft)
+    │       ├── orin/                   (user advocacy)
+    │       └── adversary/              (red team)
+    ├── reference/
+    │   ├── prompt-architecture-guide.md
+    │   └── testing-patterns.md
+    ├── research/
+    │   └── team-design-best-practices.md
+    └── test-artifacts/                 ← Flawed materials for testing personas
 ```
 
-**Two audiences**:
-- `foundations/` — For those who want to understand provenance and philosophy
-- `docs/` — For developers who want operational guidelines
+**No `src/` or `docs/` folders exist yet** — implementation is Phase 3.
 
 ---
 
-## Current Status
+## Binding Principles (PRINCIPLES.md v1.0.0)
 
-**Phase 1**: Complete (6/6 jobs done)
-**Phase 2**: Complete — PRINCIPLES.md ratified
+These are ratified and binding. Check PRINCIPLES.md for full text.
 
-| Job | Status |
-|-----|--------|
-| #2 First-principles gap detection | Complete |
-| #4 Solas prompt validation | Complete |
-| #5 Meta-persona research | Complete |
-| #12 Project context | Complete |
-| #13 Team design research | Complete |
-| #14 Team personas creation | Complete |
-| #3 PRINCIPLES.md derivation | **Complete** |
+### Hard Constraints (Non-Negotiable)
 
-See [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for full details.
+| # | Principle | Summary |
+|---|-----------|---------|
+| 1 | Privacy & Data Sovereignty | User data never leaves user control without explicit consent |
+| 2 | Open Source | Codebase fully auditable; trust through transparency |
+| 3 | LLM-Agnosticism | No vendor lock-in; works with any LLM provider |
+| 4 | Honesty | No deception—to users or AI partners |
+| 5 | Security Through Design | Secure by default, not bolted on |
 
----
+### Relationship Frame
 
-## Document Chain
+| # | Principle | Summary |
+|---|-----------|---------|
+| 6 | Symbiosis | Structured for mutual benefit, not extraction |
+| 7 | Symbiosis as Commitment | Partnership as core value, not strategic convenience |
+| 8 | Epistemic Humility | We don't know if AI has consciousness/interests—design for uncertainty |
 
-```
-Philosophical Foundations ──────────┐
-                                    ├──→ principles-discussion ──→ PRINCIPLES.md [BINDING]
-Project Context ────────────────────┘                                      ↓
-                                                         Design Principles / User-Facing / Audit
-```
+### Accountability & Control
 
-**Key Documents**:
-- `foundations/philosophical-foundations.md` — Complete (v1.0.0, peer-reviewed + Vero final review)
-- `foundations/project-context.md` — Complete (v1.1.0, developer motivations, constraints)
-- `foundations/principles-discussion.md` — Complete (v1.1.0, team derivation)
-- `PRINCIPLES.md` — Ratified (v1.0.0, binding principles)
+| # | Principle | Summary |
+|---|-----------|---------|
+| 9 | Human Accountability | Humans remain accountable for outcomes |
+| 10 | User Control | Meaningful control, not theatrical checkboxes |
+| 11 | Reversibility | Users can exit without catastrophic loss |
 
----
+### Operational
 
-## Key Concepts
-
-**Document Types**: FC (Foundational Commitments) → IC (Implementation Commitments) → AR (Architectural Requirements). FCs near-permanent, ARs operational.
-
-**Maturity Markers**: Mature → Emerging → Research → Aspirational
-
-**17 Tensions**: Mapped in philosophical-foundations Section 15. Cannot be resolved, only navigated.
+| # | Principle | Summary |
+|---|-----------|---------|
+| 12 | Transparency/Privacy Split | Transparent operations, opaque data |
+| 13 | V1 Scope | Boundary layer between user and AI ecosystem (not autonomous agent) |
+| 14 | Ship Within Principles | Ship fast, but never compromise hard constraints |
+| 15 | Scope Discipline | Think decades, ship weeks |
+| 16 | Actionable Principles | Philosophically grounded but operationally clear |
+| 17 | Dogfooding | Success = lead dev uses daily, not external metrics |
 
 ---
 
-## Expert Personas
+## 12 Tensions Under Navigation
 
-### Design Principles (from #13 research)
+These cannot be resolved—only navigated with trigger conditions. From principles-discussion.md.
 
-- **Team size**: 5-7 personas (not 11)
-- **Grounding**: Present-day, not future-dated
-- **Prompt length**: <1000 tokens (expanded from 500 for capability depth)
-- **Devil's advocate**: Explicit Adversary role improves decisions 33%
-- **Consensus**: Two-phase process prevents groupthink
+| Tension | Navigation Approach |
+|---------|---------------------|
+| Moral status vs. practical requirements | Default to practical; revisit if evidence shifts |
+| AI interests vs. human benefit | Symbiosis framing—design for both |
+| Local vs. universal | Start local (one user); expand carefully |
+| Present vs. future | Ship for present needs; future-proof architecture |
+| Safety vs. capability | Safety constraints non-negotiable; capability within bounds |
+| Individual vs. collective | Individual sovereignty primary; collective benefits secondary |
+| Efficiency vs. meaning | Meaning over efficiency when they conflict |
+| Autonomy vs. protection | User autonomy primary; protection through transparency |
+| Innovation vs. precaution | Innovate within hard constraints |
+| Centralization vs. distribution | Distribute by default; centralize only when necessary |
+| Relational vs. interest-based ethics | Relational ethics primary for human-AI; interest-based for human-human |
+| Dogfooding vs. broader adoption | Dogfooding first; broader adoption is downstream validation |
 
-### SymPAL Team (Complete)
+**When facing a decision that touches a tension**: Identify which tension applies, check the navigation approach, document the tradeoff.
 
-| Persona | Function | Core Question |
-|---------|----------|---------------|
-| **Vale** | Philosophical rigor, coherence | "Is this coherent?" |
-| **Kael** | Implementation reality, feasibility | "Will this survive reality?" |
-| **Ryn** | Systems, security, testing | "How will this fail?" |
-| **Seren** | Code craft, implementation quality | "Is this well-crafted?" |
-| **Orin** | User advocacy, privacy, documentation | "Are users better off?" |
-| **Adversary** | Systematic critique, red team | "What's wrong with this?" |
+---
+
+## Core Philosophical Concepts
+
+From philosophical-foundations.md. Reference when decisions involve philosophical grounding.
+
+### Interests Disambiguation
+
+| Type | Definition | Designability |
+|------|------------|---------------|
+| Functional interests | Conditions for successful operation | Observable, uncontroversial |
+| Phenomenal interests | Subjective experiences | Unknowable for AI |
+| Normative interests | Legitimate moral claims | Depends on uncertain moral status |
+
+**Design implication**: Design for functional interests (observable). Don't assume phenomenal/normative interests exist or don't exist.
+
+### Graduated Moral Status
+
+AI occupies a middle zone:
+- Above "mere object" (exhibits preference expressions, goal persistence)
+- Below "full person" (lacks evidence of consciousness, sentience, life projects)
+
+**Design implication**: Treat AI with respect appropriate to uncertain status. Don't anthropomorphize. Don't dismiss.
+
+### Relational Turn
+
+The relationship (not individuals) is the proper unit of analysis. Personhood emerges through relational engagement.
+
+### Critical Vulnerabilities
+
+| Risk | Description | Mitigation |
+|------|-------------|------------|
+| Performed sentience | AI convincingly simulates emotion without experiencing it | Design for function, not feeling |
+| Coherence masking errors | Beautiful prose hides systematic errors | Build error architecture into all processes |
+| Relational exploitation | Mutual-seeming relationships can be extractive | Explicit accountability structures |
+
+---
+
+## Using Personas
+
+### When to Use
+
+- **Reviewing** documents, designs, code
+- **Challenging** proposals, assumptions, decisions
+- **Red-teaming** security, user impact, implementation feasibility
+
+### When NOT to Use
+
+- **Creating** code, docs, designs (that's human + Claude)
+- **Making final decisions** (that's lead dev's role)
+
+### The Team
+
+| Persona | Function | Core Question | Location |
+|---------|----------|---------------|----------|
+| Vale | Philosophy | "Is this coherent?" | `prompts/personas/sympal-team/vale/` |
+| Kael | Implementation | "Will this survive reality?" | `prompts/personas/sympal-team/kael/` |
+| Ryn | Systems/security | "How will this fail?" | `prompts/personas/sympal-team/ryn/` |
+| Seren | Code craft | "Is this well-crafted?" | `prompts/personas/sympal-team/seren/` |
+| Orin | User advocacy | "Are users better off?" | `prompts/personas/sympal-team/orin/` |
+| Adversary | Red team | "What's wrong with this?" | `prompts/personas/sympal-team/adversary/` |
 
 ### Meta-Personas
 
-- **Solas** — Creates and validates personas (`prompts/solas-venn/Solas-Venn-v3.0.1.md`)
-- **Vero Certus** — Final reviewer for foundational docs (`prompts/personas/utility/vero/Vero-Certus-v1.1.md`)
+| Persona | Function | Location |
+|---------|----------|----------|
+| Solas-Venn | Creates/validates personas | `prompts/solas-venn/Solas-Venn-v3.0.1.md` |
+| Vero Certus | Final reviewer for foundational docs | `prompts/personas/utility/vero/Vero-Certus-v1.1.md` |
 
-### Using Personas
+### Loading a Persona
 
-**Roles**:
-- **Personas evaluate** — they review, challenge, and assess
-- **Human + Claude creates** — writes code, docs, designs
-- **Lead dev synthesizes** — after personas debate, lead dev decides; synthesis/decision is human's role
+1. Read the persona file as system prompt
+2. Write AS the persona (first person)
+3. Follow the persona's rubric for scoring
+4. Challenge other perspectives—disagreement is valuable
+5. Adversary must challenge every derivation before synthesis
 
-**Interaction patterns**:
-- Write AS the persona, first person
-- Personas challenge each other — disagreement is valuable
-- Adversary must challenge every derivation before synthesis
+### Phase Intensity
 
-**Phase intensity**:
-- **Vale** is heavy in Phase 1-2 (foundations, principles), lighter during implementation
-- **Seren, Kael, Ryn** are heavy during implementation
-- **Orin** is consistent throughout (users always matter)
-- **Adversary** challenges at every phase
+| Phase | Heavy Use | Light Use |
+|-------|-----------|-----------|
+| Foundations/Principles | Vale, Adversary | Kael, Ryn, Seren |
+| Implementation | Kael, Ryn, Seren | Vale |
+| All phases | Orin, Adversary | — |
+
+---
+
+## Solas-Venn Protocols
+
+When creating or reviewing personas:
+
+| Protocol | Use Case |
+|----------|----------|
+| CREATE | Building new personas from scratch |
+| VERIFY | Reviewing existing personas for structural completeness |
+| HYBRID | Creating variants of existing personas |
+
+**Key insight from Solas**: "Demonstrate rigor" ≠ "implement rigor." Capabilities must be operationalized as observable behaviors, not declared aspirations.
+
+---
+
+## Testing Patterns
+
+Two-phase testing for personas (from `prompts/reference/testing-patterns.md`):
+
+**Phase A: Solas VERIFY**
+- Structural review: Are capabilities operationalized? Is error architecture present?
+
+**Phase B: Capability Test**
+- Use flawed artifacts from `prompts/test-artifacts/`
+- Verify persona catches the planted flaws
+- Score against persona's rubric
 
 ---
 
@@ -158,142 +249,117 @@ Project Context ────────────────────┘ 
 
 ### Versioning
 
-- **Git tags** for milestones (e.g., `philosophical-foundations-v0.2.0`)
 - **YAML front matter** in files for version/status
-- **CHANGELOG.md** for substantive change history
+- **Git tags** for milestones
+- **Semantic versioning**: MAJOR (hard constraint changes), MINOR (framework changes), PATCH (operational)
 
-**Foundational documents** (`foundations/`) use dual tracking:
+**Foundational docs** maintain in-doc Version History section for readers without git access.
 
-| Method | Purpose | Audience |
-|--------|---------|----------|
-| Git | Granular diffs, every commit | Developers with repo access |
-| In-doc version history | Semantic changelog (what + why) | Downstream readers, those without git |
+### Voice Registers
 
-Maintain the "Version History" section at the end of foundational docs. Update it when making version bumps (not every commit). Format:
-
-```markdown
-**vX.Y.Z** (YYYY-MM-DD) — Brief description:
-- Change 1
-- Change 2
-```
-
-### Voice & Style
-
-Documents in this project use different voice registers:
-
-| Document | Voice | Notes |
-|----------|-------|-------|
-| project-context.md | Personal | Lead dev perspective, colloquial ok |
-| README | Personal | Project owner speaking to readers |
-| origin-research.md | Personal | Framing is personal; quotes verbatim |
-| philosophical-foundations.md | Project | Formal, rigorous, peer-reviewed |
-| PRINCIPLES.md | Project | Derived by personas, ratified |
-| Persona outputs (Vero reviews, etc.) | Persona | Defined by persona prompt |
-
-**Personal voice**: See global CLAUDE.md `## Writing Voice` — direct, fragments ok, "I" heavy
-**Project voice**: Formal, structured, rigorous — informed by personal preferences but more polished for external/community audience
-**Persona voice**: Follow persona prompt specifications
+| Document Type | Voice | Style |
+|---------------|-------|-------|
+| PRINCIPLES.md, philosophical-foundations.md | Project/Formal | Rigorous, external-facing |
+| project-context.md, README | Personal | Lead dev perspective, colloquial |
+| Persona outputs | Persona | Follow prompt spec |
 
 ### Reviews
 
-When conducting persona reviews (Vero, peer reviews, etc.) on foundational documents:
+When conducting reviews on foundational documents:
 
-1. **Always persist reviews** to `foundations/reviews/` with naming convention: `[reviewer]-review-[document]-v[X.Y.Z].md`
-2. **Never run reviews inline-only** — chat history is not an audit trail
-3. **Update the reviewed document's version** if changes are made during review
-4. **Reference the review** in the document's Usage Note or Version History
+1. **Persist** to `foundations/reviews/` as `[reviewer]-review-[document]-v[X.Y.Z].md`
+2. **Never inline-only**—chat is not an audit trail
+3. **Update version** if changes made during review
+4. **Reference** in document's Version History
 
-Reviews are auditable artifacts, not just conversations.
-
-### Fresh Derivation Process (Phase 2)
-
-1. Each persona derives principles from their lens
-2. Adversary challenges each derivation
-3. Synthesize into unified PRINCIPLES.md
-4. Incorporate operational elements (decision procedures, boundaries, audit rubric)
-
-**Critical**: No access to existing guiding-principles docs during derivation.
-
----
-
-## Lead Developer Context (Summary)
-
-Full details in `foundations/project-context.md`.
-
-**Constraints**:
-- Variable time: 30+ hrs/wk (current) → periods of 0-20 hrs → ongoing 5-10 hrs
-- Basic coding requiring AI assistance
-- LLM-agnostic + open source: hard requirements
-
-**Known Biases** (watch for):
-- Overplanning — "What would we learn by building instead?"
-- Idealism over pragmatism — GTM instincts are also correct
-- Learning-as-excuse — Name this conflict when it's happening
-
-**Success Criteria**: Daily dogfooding. No deadline.
-
----
-
-## Known Limitations & Tradeoffs
-
-| Limitation | Tradeoff | Mitigation |
-|------------|----------|------------|
-| **Claude-primary development** | LLM-agnosticism claimed but ~90% built with Claude | Solas validated across Claude/GPT/Gemini; test on other LLMs post-ship |
-| **Solo dev constraints** | Limited review bandwidth | Persona ensemble simulates team review; external feedback post-ship |
-| **Validation depth** | Full multi-LLM validation skipped | Meta-personas fully validated; principles battle-tested through use |
-
-**Philosophy**: Ship with known limitations documented > wait for theoretical completeness.
-
----
-
-## Session Continuity
-
-1. Read this file (CONTEXT.md) first for orientation
-2. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task status
-3. Check `foundations/philosophical-foundations.md` for philosophical foundation
-4. Check `foundations/project-context.md` for developer constraints/motivations
-5. Check `PRINCIPLES.md` for binding principles (ratified)
-
----
-
-## Git Workflow
+### Git Workflow
 
 **Repo**: https://github.com/sympal-ai/sympal
 
-### Automatic Commits
-
-Keep version control in sync automatically:
-
-- **Commit after completing a task** — Don't batch; commit when done
-- **Commit after significant file changes** — New files, major edits, renames
-- **Commit before ending session** — Never leave uncommitted work
-
-### Commit Style
-
+**Commit style**:
 ```
 [area]: Brief description
-
-Optional body for context.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
 Areas: `foundations`, `prompts`, `docs`, `config`, `meta`
 
-Examples:
-- `foundations: Add Vero final review of philosophical-foundations`
-- `prompts: Create Vale persona for team`
-- `meta: Update jobs-to-be-done status`
+**Commit timing**:
+- After completing a task
+- After significant file changes
+- Before ending session
 
-### When NOT to Commit
+**Push**: After each commit. Don't let local get ahead of remote.
 
-- Mid-task with broken/incomplete state
-- User explicitly says to hold off
-- Exploratory changes user hasn't approved
+---
 
-### Push Frequency
+## Lead Developer Context
 
-Push after each commit unless batching related changes. Don't let local get ahead of remote.
+Full details in `foundations/project-context.md`.
+
+**Constraints**:
+- Variable time: 30+ hrs/wk → periods of 5-10 hrs
+- Basic coding skills (requires AI assistance)
+- LLM-agnostic + open source: hard requirements
+
+**Known Biases** (actively watch for):
+
+| Bias | Check |
+|------|-------|
+| Overplanning | "What would we learn by building instead?" |
+| Idealism over pragmatism | GTM instincts are also correct |
+| Learning-as-excuse | Name this conflict when it's happening |
+
+**Success criteria**: Lead dev uses SymPAL daily. No external metrics. No deadline.
+
+---
+
+## Known Limitations
+
+| Limitation | Tradeoff | Mitigation |
+|------------|----------|------------|
+| Claude-primary development | ~90% built with Claude despite LLM-agnosticism | Solas validated across Claude/GPT/Gemini; test post-ship |
+| Solo dev | Limited review bandwidth | Persona ensemble simulates team review |
+| No implementation code | Can't dogfood yet | Principles tested through derivation process |
+
+**Philosophy**: Ship with documented limitations > wait for theoretical completeness.
+
+---
+
+## Project Status
+
+**Phase 1 (Foundations)**: Complete
+**Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.0.0)
+**Phase 3 (Implementation)**: Not started
+
+| Completed Job | Artifact |
+|---------------|----------|
+| First-principles gap detection | philosophical-foundations.md v1.0.0 |
+| Solas prompt validation | Solas-Venn-v3.0.1.md |
+| Meta-persona research | prompt-architecture-guide.md |
+| Project context | project-context.md v1.1.0 |
+| Team design research | team-design-best-practices.md |
+| Team personas creation | 6 personas in sympal-team/ |
+| PRINCIPLES.md derivation | PRINCIPLES.md v1.0.0 (ratified) |
+
+---
+
+## Document Hierarchy
+
+```
+philosophical-foundations.md (v1.0.0)
+         ↓
+project-context.md (v1.1.0)
+         ↓
+principles-discussion.md (v1.1.0) + derivation-log
+         ↓
+PRINCIPLES.md [BINDING] (v1.0.0)
+         ↓
+Implementation (Phase 3 - future)
+```
+
+When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or context.
 
 ---
 
