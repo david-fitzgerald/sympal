@@ -1,7 +1,7 @@
 # Principles Discussion
 
-**Version:** 1.1.0
-**Date:** 2026-01-16
+**Version:** 1.2.0
+**Date:** 2026-01-17
 **Status:** Complete
 **Source:** Derived from philosophical-foundations.md (v1.0.0) and project-context.md (v1.1.0)
 **Process:** Full derivation log at `foundations/principles-derivation-log.md`
@@ -209,7 +209,7 @@ For use in PRINCIPLES.md:
 
 ### Accountability & Control
 
-9. **Human Accountability:** Humans remain accountable for AI-assisted decisions. Partnership does not diffuse responsibility. *(Revisit as AI accountability mechanisms develop.)*
+9. **Human Accountability:** Humans remain accountable for AI actions. Partnership does not diffuse responsibility. *(Revisit as AI accountability mechanisms develop.)*
 
 10. **User Control:** Privacy is not the absence of utility. It is the presence of user control. User control must be meaningful, not theatrical. Defaults favor privacy. Choices are clear and reversible. SymPAL never profits from user choosing to share more.
 
@@ -242,3 +242,7 @@ For use in PRINCIPLES.md:
 **v1.1.0** (2026-01-16) — Added trigger conditions:
 - Team-defined triggers for all 13 deferred tensions (Tension 5 resolved by change protocol)
 - Triggers specify when each deferred tension should be revisited
+
+**v1.2.0** (2026-01-17) — Vero Certus review:
+- Fixed language inconsistency: P9 "AI-assisted decisions" → "AI actions" to match Part 1 framing
+- Review persisted to `foundations/reviews/vero-review-principles-discussion-v1.1.0.md`
