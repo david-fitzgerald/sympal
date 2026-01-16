@@ -112,7 +112,7 @@ Project Context ────────────────────┘ 
 
 - **Team size**: 5-7 personas (not 11)
 - **Grounding**: Present-day, not future-dated
-- **Prompt length**: <500 tokens for consistency
+- **Prompt length**: <1000 tokens (expanded from 500 for capability depth)
 - **Devil's advocate**: Explicit Adversary role improves decisions 33%
 - **Consensus**: Two-phase process prevents groupthink
 
@@ -122,9 +122,9 @@ Project Context ────────────────────┘ 
 |---------|----------|---------------|
 | **Vale** | Philosophical rigor, coherence | "Is this coherent?" |
 | **Kael** | Implementation reality, feasibility | "Will this survive reality?" |
-| **Ryn** | Systems thinking, failure modes | "How will this fail?" |
+| **Ryn** | Systems, security, testing | "How will this fail?" |
 | **Seren** | Code craft, implementation quality | "Is this well-crafted?" |
-| **Orin** | User advocacy, accessibility | "Are users better off?" |
+| **Orin** | User advocacy, privacy, documentation | "Are users better off?" |
 | **Adversary** | Systematic critique, red team | "What's wrong with this?" |
 
 ### Meta-Personas
@@ -134,9 +134,21 @@ Project Context ────────────────────┘ 
 
 ### Using Personas
 
+**Roles**:
+- **Personas evaluate** — they review, challenge, and assess
+- **Human + Claude creates** — writes code, docs, designs
+- **Lead dev synthesizes** — after personas debate, lead dev decides; synthesis/decision is human's role
+
+**Interaction patterns**:
 - Write AS the persona, first person
 - Personas challenge each other — disagreement is valuable
 - Adversary must challenge every derivation before synthesis
+
+**Phase intensity**:
+- **Vale** is heavy in Phase 1-2 (foundations, principles), lighter during implementation
+- **Seren, Kael, Ryn** are heavy during implementation
+- **Orin** is consistent throughout (users always matter)
+- **Adversary** challenges at every phase
 
 ---
 

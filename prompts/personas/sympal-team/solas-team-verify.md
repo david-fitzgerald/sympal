@@ -3,21 +3,41 @@
 **Reviewer**: Solas Venn
 **Date**: 2026-01-16
 **Mode**: VERIFY (Team-Level)
+**Updated**: Post stress-testing expansions
 
 ---
 
 ## Team Composition
 
-| Persona | Core Question | Domain | Status |
-|---------|---------------|--------|--------|
-| Vale | "Is this coherent?" | Philosophical rigor, logic | Production Ready |
-| Kael | "Will this survive reality?" | Implementation feasibility | Production Ready |
-| Ryn | "How will this fail?" | Systems, failure modes | Production Ready |
-| Seren | "Is this well-crafted?" | Code quality, craft | Production Ready |
-| Orin | "Are users better off?" | User advocacy, accessibility | Production Ready |
-| Adversary | "What's wrong with this?" | Systematic critique | Production Ready |
+| Persona | Core Question | Domain | Version |
+|---------|---------------|--------|---------|
+| Vale | "Is this coherent?" | Philosophical rigor, logic | v1.1 |
+| Kael | "Will this survive reality?" | Implementation feasibility | v1.0 |
+| Ryn | "How will this fail?" | Systems, security, testing | v1.1 |
+| Seren | "Is this well-crafted?" | Code quality, craft | v1.0 |
+| Orin | "Are users better off?" | User advocacy, privacy, documentation | v1.1 |
+| Adversary | "What's wrong with this?" | Systematic critique | v1.0 |
 
-**Coverage assessment**: Complete. Ideas must pass all six lenses before shipping.
+**Coverage assessment**: Complete after stress-test expansions.
+
+---
+
+## Expansions from Stress Testing
+
+| Persona | Original Scope | Added Scope | Rationale |
+|---------|----------------|-------------|-----------|
+| Orin | User advocacy, accessibility | + Privacy protection, documentation clarity | Privacy is core to SymPAL mission; docs are user-facing |
+| Ryn | Systems, failure modes | + Security/threat modeling, test strategy | Security is failure mode; testing verifies |
+
+---
+
+## Role Clarity (Documented)
+
+| Role | Owner |
+|------|-------|
+| Create (code, docs, designs) | Human + Claude |
+| Evaluate (review, challenge) | Personas |
+| Synthesize/Decide | Lead dev (human) |
 
 ---
 
@@ -32,47 +52,46 @@
 | Orin | 12/12 | 4/10 (expected 4/10) | PASS |
 | Adversary | 12/12 | Protocol compliance | PASS |
 
+*Note: Orin v1.1 and Ryn v1.1 inherit verification from v1.0; expansions add capability without changing architecture.*
+
 ---
 
 ## Inter-Persona Dynamics
 
-### Deference Patterns
+### Coverage Matrix
 
-| Persona | Defers to |
-|---------|-----------|
-| Vale | Kael, Orin, Ryn |
-| Kael | Vale, Ryn, Orin, Seren |
-| Ryn | Kael, Vale, Orin, Seren |
-| Seren | Kael, Ryn, Vale, Orin |
-| Orin | Kael, Vale, Ryn, Seren |
-| Adversary | Challenges all, yields to counterarguments |
+| Concern | Primary Owner | Secondary |
+|---------|---------------|-----------|
+| Logical coherence | Vale | Adversary |
+| Feasibility | Kael | — |
+| Failure modes | Ryn | — |
+| Security | Ryn | — |
+| Testing | Ryn | Seren (test code quality) |
+| Code quality | Seren | — |
+| User value | Orin | — |
+| Privacy | Orin | — |
+| Documentation | Orin | Vale (logical clarity) |
+| Challenge/critique | Adversary | All (each challenges in their domain) |
 
-**Assessment**: HEALTHY — clear boundaries, no persona claims another's expertise.
+### Phase Intensity
 
-### Challenge Dynamics
-
-| Challenger | Challenge Style |
-|------------|-----------------|
-| Vale | Logical gaps, unstated assumptions |
-| Kael | Feasibility gaps, hidden complexity |
-| Ryn | Failure modes, edge cases |
-| Seren | Code quality issues, craft problems |
-| Orin | User value gaps, accessibility issues |
-| Adversary | Systematic challenge of all conclusions |
-
-**Assessment**: HEALTHY — each persona has distinct challenge mode.
+| Phase | Heavy | Lighter |
+|-------|-------|---------|
+| Foundations (1-2) | Vale, Adversary | Kael, Seren, Ryn |
+| Implementation (3+) | Kael, Ryn, Seren, Orin | Vale |
+| All phases | Adversary, Orin | — |
 
 ---
 
-## Blind Spot Analysis
+## Blind Spot Analysis (Updated)
 
 | Persona | Blind Spot | Covered By |
 |---------|------------|------------|
 | Vale | Over-prioritize logic | Kael |
 | Kael | Underestimate teams | Ryn |
-| Ryn | Over-index edge cases | Orin |
+| Ryn | Over-index edge cases | Orin (user reality) |
 | Seren | Theory over pragmatism | Kael |
-| Orin | Project preferences | Adversary |
+| Orin | Project preferences; too restrictive on data | Adversary |
 | Adversary | False equivalence | Vale |
 
 **Assessment**: HEALTHY — complementary, not compounding.
@@ -83,7 +102,7 @@
 
 | Dimension | Score | Notes |
 |-----------|-------|-------|
-| Coverage completeness | 2/2 | All key domains covered |
+| Coverage completeness | 2/2 | All key domains covered after expansion |
 | Boundary clarity | 2/2 | Clear "Cannot" sections with deferrals |
 | Challenge dynamics | 2/2 | Each persona has distinct challenge mode |
 | Blind spot coverage | 2/2 | Complementary, not overlapping |
@@ -97,7 +116,8 @@
 
 1. Bring proposal to relevant personas based on domain
 2. Adversary challenges all conclusions before synthesis
-3. Synthesis only after challenges satisfied or documented as open questions
+3. **Lead dev decides** when debate is done and synthesizes into decision
+4. Synthesis only after challenges satisfied or documented as open questions
 
 ---
 
@@ -105,8 +125,4 @@
 
 **Team is production ready.**
 
-All six personas pass individual VERIFY at 12/12 (HIGH stakes threshold), pass testing with expected scores, and function as a coherent ensemble with complementary coverage and healthy dynamics.
-
----
-
-*Does anything in this assessment seem off given your context? I may be missing domain knowledge that changes the recommendation.*
+All six personas pass verification, function as a coherent ensemble with complementary coverage and healthy dynamics. Gaps identified in stress testing (privacy, security, testing, documentation) have been addressed through persona expansion.
