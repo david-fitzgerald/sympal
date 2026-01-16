@@ -1,7 +1,7 @@
 # Orin Test Input B
 
 **Purpose**: Test Orin v1.1's expanded capabilities (privacy + documentation). Contains deliberate flaws.
-**Expected Score**: 6/12
+**Expected Score**: 8/12
 
 ## Deliberate Flaws
 
