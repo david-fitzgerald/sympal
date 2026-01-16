@@ -274,7 +274,7 @@ When conducting reviews on foundational documents:
 
 ### Git Workflow
 
-**Repo**: https://github.com/sympal-ai/sympal
+**Repo**: https://github.com/david-fitzgerald/sympal
 
 **Commit style**:
 ```
