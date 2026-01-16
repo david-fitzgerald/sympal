@@ -164,6 +164,17 @@ Maintain the "Version History" section at the end of foundational docs. Update i
 - Change 2
 ```
 
+### Reviews
+
+When conducting persona reviews (Vero, peer reviews, etc.) on foundational documents:
+
+1. **Always persist reviews** to `foundations/reviews/` with naming convention: `[reviewer]-review-[document]-v[X.Y.Z].md`
+2. **Never run reviews inline-only** — chat history is not an audit trail
+3. **Update the reviewed document's version** if changes are made during review
+4. **Reference the review** in the document's Usage Note or Version History
+
+Reviews are auditable artifacts, not just conversations.
+
 ### Fresh Derivation Process (Phase 2)
 
 1. Each persona derives principles from their lens
@@ -256,4 +267,4 @@ Push after each commit unless batching related changes. Don't let local get ahea
 
 ---
 
-*Last updated: 2026-01-15*
+*Last updated: 2026-01-16*
