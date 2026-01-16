@@ -30,12 +30,15 @@ sympal/
 ├── foundations/            ← "Why we built it this way"
 │   ├── philosophical-foundations.md   (v1.0.0, 327KB, peer-reviewed)
 │   ├── project-context.md             (v1.1.0, dev context)
-│   ├── principles-discussion.md       (v1.1.0, derivation)
+│   ├── principles-discussion.md       (v1.2.0, derivation)
 │   ├── principles-derivation-log.md   (audit trail)
 │   ├── origin-research.md             (v0.2.0, LLM responses on data exploitation)
+│   ├── prd-tdd-plan.md                (v1.0.0, PRD/TDD process guide)
 │   └── reviews/
 │       ├── vero-final-review-philosophical-foundations-v0.2.0.md
 │       ├── vero-review-project-context-v0.3.0.md
+│       ├── vero-review-principles-discussion-v1.1.0.md
+│       ├── vero-review-PRINCIPLES-v1.0.0.md
 │       ├── codex-review-philosophical-foundations-v0.1.1.md
 │       └── gemini-review-philosophical-foundations-v0.1.1.md
 │
@@ -59,6 +62,10 @@ sympal/
     │   └── testing-patterns.md
     ├── research/
     │   └── team-design-best-practices.md
+    ├── workflows/                      ← PRD/TDD creation prompts
+    │   ├── prd/                        (extraction + synthesis)
+    │   ├── tdd/                        (extraction + synthesis)
+    │   └── principles-checkpoint.md
     └── test-artifacts/                 ← Flawed materials for testing personas
 ```
 
@@ -66,7 +73,7 @@ sympal/
 
 ---
 
-## Binding Principles (PRINCIPLES.md v1.0.0)
+## Binding Principles (PRINCIPLES.md v1.1.0)
 
 These are ratified and binding. Check PRINCIPLES.md for full text.
 
@@ -354,15 +361,19 @@ philosophical-foundations.md (v1.0.0)
          ↓
 project-context.md (v1.1.0)
          ↓
-principles-discussion.md (v1.1.0) + derivation-log
+principles-discussion.md (v1.2.0) + derivation-log
          ↓
-PRINCIPLES.md [BINDING] (v1.0.0)
+PRINCIPLES.md [BINDING] (v1.1.0)
          ↓
-Implementation (Phase 3 - future)
+PRD (via prd-tdd-plan.md) ← CURRENT
+         ↓
+TDD
+         ↓
+Implementation (Phase 3)
 ```
 
 When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or context.
 
 ---
 
-*Last updated: 2026-01-16*
+*Last updated: 2026-01-17*
