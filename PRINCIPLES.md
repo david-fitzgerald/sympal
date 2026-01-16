@@ -1,7 +1,7 @@
 # SymPAL Principles
 
-**Version:** 1.0.0
-**Date:** 2026-01-16
+**Version:** 1.1.0
+**Date:** 2026-01-17
 **Status:** Ratified
 **Derived from:** philosophical-foundations.md (v1.0.0), project-context.md (v1.1.0)
 **Process:** foundations/principles-discussion.md, foundations/principles-derivation-log.md
@@ -70,7 +70,7 @@ These define responsibility and user agency.
 
 ### 9. Human Accountability
 
-Humans remain accountable for AI-assisted decisions. Partnership does not diffuse responsibility.
+Humans remain accountable for AI actions. Partnership does not diffuse responsibility.
 
 *Revisit clause: As AI accountability mechanisms develop, revisit this asymmetry.*
 
@@ -199,3 +199,7 @@ If principles conflict or a decision is unclear:
 - 12 tensions under navigation with triggers
 - Change protocol established
 - Derived through full team deliberation with Adversary challenge
+
+**v1.1.0** (2026-01-17) — Vero Certus review:
+- Fixed P9 language inconsistency: "AI-assisted decisions" → "AI actions" (broader framing)
+- Review persisted to `foundations/reviews/vero-review-PRINCIPLES-v1.0.0.md`
