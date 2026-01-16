@@ -265,6 +265,8 @@ Two-phase testing for personas (from `prompts/reference/testing-patterns.md`):
 
 ### Reviews
 
+**Vero review required**: Before any foundational document is considered "final" or "ratified", it must have a Vero Certus review. Vero catches Meridian-style errors (coherent but systematically wrong) that team deliberation may miss. This is non-negotiable for binding documents.
+
 When conducting reviews on foundational documents:
 
 1. **Persist** to `foundations/reviews/` as `[reviewer]-review-[document]-v[X.Y.Z].md`
