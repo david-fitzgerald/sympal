@@ -37,6 +37,15 @@ prompts/
 │   ├── prompt-architecture-guide.md   # How to build personas
 │   └── testing-patterns.md            # How to test personas
 │
+├── workflows/                         # Document creation workflows
+│   ├── prd/
+│   │   ├── prd-extraction.md          # Orin interviews Lead Dev
+│   │   └── prd-synthesis.md           # Kael + Orin draft PRD
+│   ├── tdd/
+│   │   ├── tdd-extraction.md          # Kael + Ryn interview Lead Dev
+│   │   └── tdd-synthesis.md           # Kael + Ryn draft TDD
+│   └── principles-checkpoint.md       # Verify PRINCIPLES.md alignment
+│
 └── README.md
 ```
 
@@ -180,6 +189,68 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 
 ---
 
+## PRD/TDD Workflow
+
+Structured dialogue process for creating Product Requirements Documents and Technical Design Documents. Uses persona team to extract, synthesize, and challenge.
+
+**Full plan**: `foundations/prd-tdd-plan.md`
+
+### Process Overview
+
+```
+Phase 1: EXTRACTION ──► Team interviews Lead Dev
+         │
+         ▼
+Phase 2: SYNTHESIS ──► Team drafts structured document
+         │
+         ▼
+Phase 3: CHECKPOINT ──► Verify PRINCIPLES.md alignment
+         │
+         ▼
+Phase 4: CHALLENGE ──► Adversary + specialists review
+         │
+         ▼
+Phase 5: REFINEMENT ──► Lead Dev edits, team assists
+         │
+         ▼
+Phase 6: VERO REVIEW ──► Final coherence check
+```
+
+### PRD Workflow
+
+| Phase | Prompt | Personas |
+|-------|--------|----------|
+| Extraction | `workflows/prd/prd-extraction.md` | Orin |
+| Synthesis | `workflows/prd/prd-synthesis.md` | Kael + Orin |
+| Checkpoint | `workflows/principles-checkpoint.md` | Vale / checklist |
+| Challenge | Standard Adversary | Adversary + Orin |
+| Refinement | — | Lead Dev + team |
+| Vero Review | Standard Vero | Vero Certus |
+
+### TDD Workflow
+
+| Phase | Prompt | Personas |
+|-------|--------|----------|
+| Extraction | `workflows/tdd/tdd-extraction.md` | Kael + Ryn |
+| Synthesis | `workflows/tdd/tdd-synthesis.md` | Kael + Ryn |
+| Checkpoint | `workflows/principles-checkpoint.md` | Vale / checklist |
+| Challenge | Standard Adversary | Adversary + Seren |
+| Refinement | — | Lead Dev + team |
+| Vero Review | Standard Vero | Vero Certus |
+
+### Principles Checkpoint
+
+Verifies PRINCIPLES.md alignment after synthesis. Checks:
+- Hard Constraints (P1-P5): ANY failure = BLOCKED
+- Relationship Frame (P6-P8): Concerns for Challenge phase
+- Accountability & Control (P9-P11): May need feature additions
+- Operational (P12-P17): Scope/framing issues
+- Deferred Tensions: Flag if triggered without navigation
+
+**Prompt**: `workflows/principles-checkpoint.md`
+
+---
+
 ## Workflow for SymPAL Teams
 
 ```
@@ -231,6 +302,12 @@ When Solas produces suboptimal output:
 | `reference/testing-patterns.md` | Two-phase testing methodology |
 | `test-artifacts/dr-sage-persona-v1.0.md` | Test artifact for persona reviewers |
 | `test-artifacts/researcher-flawed-research-v1.0.md` | Test artifact for document reviewers |
+| `workflows/prd/prd-extraction.md` | PRD interview protocol (Orin) |
+| `workflows/prd/prd-synthesis.md` | PRD drafting protocol (Kael + Orin) |
+| `workflows/tdd/tdd-extraction.md` | TDD interview protocol (Kael + Ryn) |
+| `workflows/tdd/tdd-synthesis.md` | TDD drafting protocol (Kael + Ryn) |
+| `workflows/principles-checkpoint.md` | PRINCIPLES.md alignment verification |
+| `../foundations/prd-tdd-plan.md` | Full PRD/TDD implementation plan |
 
 ---
 
