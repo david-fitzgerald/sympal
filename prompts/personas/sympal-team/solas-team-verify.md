@@ -121,6 +121,15 @@
 
 ---
 
+## Known Gaps (Deferred)
+
+| Gap | Status | Rationale |
+|-----|--------|-----------|
+| **Ops/DevOps** | Deferred | Nothing deployed yet. Revisit when infrastructure exists. |
+| **Product roadmap/prioritization** | Human-owned | Lead dev owns roadmap for now. Future: transition to AI (self-developing system). |
+
+---
+
 ## Conclusion
 
 **Team is production ready.**
