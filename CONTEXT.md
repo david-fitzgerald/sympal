@@ -29,9 +29,10 @@ sympal/
 ├── LICENSE
 │
 ├── foundations/                  ← "Why we built it this way"
-│   ├── philosophical-foundations.md    (was: first-principles-research)
-│   ├── project-context.md              (was: lead-dev-context)
-│   ├── principles-discussion.md        (created during Phase 2)
+│   ├── philosophical-foundations.md    (v1.0.0, peer-reviewed)
+│   ├── project-context.md              (v1.1.0, dev context)
+│   ├── principles-discussion.md        (v1.1.0, derivation output)
+│   ├── principles-derivation-log.md    (process audit trail)
 │   └── reviews/
 │       ├── codex-review-philosophical-foundations-v0.1.1.md
 │       └── gemini-review-philosophical-foundations-v0.1.1.md
@@ -46,7 +47,7 @@ sympal/
 │   ├── solas-venn/               ← Meta-persona for creating personas
 │   ├── personas/
 │   │   ├── utility/              ← General-purpose (Vero)
-│   │   └── sympal-team/          ← Project team (pending #14)
+│   │   └── sympal-team/          ← Project team (Vale, Kael, Ryn, Seren, Orin, Adversary)
 │   ├── research/
 │   ├── reference/
 │   └── test-artifacts/
@@ -64,7 +65,7 @@ sympal/
 ## Current Status
 
 **Phase 1**: Complete (6/6 jobs done)
-**Next**: Phase 2 — Fresh guiding-principles derivation
+**Phase 2**: Complete — PRINCIPLES.md ratified
 
 | Job | Status |
 |-----|--------|
@@ -73,7 +74,8 @@ sympal/
 | #5 Meta-persona research | Complete |
 | #12 Project context | Complete |
 | #13 Team design research | Complete |
-| #14 Team personas creation | **Complete** |
+| #14 Team personas creation | Complete |
+| #3 PRINCIPLES.md derivation | **Complete** |
 
 See [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for full details.
 
@@ -89,10 +91,10 @@ Project Context ────────────────────┘ 
 ```
 
 **Key Documents**:
-- `foundations/philosophical-foundations.md` — Complete (v0.3.0, peer-reviewed + Vero final review)
-- `foundations/project-context.md` — Complete (developer motivations, constraints)
-- `foundations/principles-discussion.md` — Pending (team derivation in Phase 2)
-- `PRINCIPLES.md` — Pending (synthesized from discussion)
+- `foundations/philosophical-foundations.md` — Complete (v1.0.0, peer-reviewed + Vero final review)
+- `foundations/project-context.md` — Complete (v1.1.0, developer motivations, constraints)
+- `foundations/principles-discussion.md` — Complete (v1.1.0, team derivation)
+- `PRINCIPLES.md` — Ratified (v1.0.0, binding principles)
 
 ---
 
@@ -250,7 +252,7 @@ Full details in `foundations/project-context.md`.
 2. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task status
 3. Check `foundations/philosophical-foundations.md` for philosophical foundation
 4. Check `foundations/project-context.md` for developer constraints/motivations
-5. For Phase 2: Do NOT read existing guiding-principles docs
+5. Check `PRINCIPLES.md` for binding principles (ratified)
 
 ---
 

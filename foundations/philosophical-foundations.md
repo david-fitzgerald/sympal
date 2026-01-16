@@ -4737,11 +4737,16 @@ The philosophical work has been done. The practical work begins.
 
 ---
 
-**Document Status**: Philosophical Foundations v0.3.0
+**Document Status**: Philosophical Foundations v1.0.0
 
 ---
 
 ### Version History
+
+**v1.0.0** (2026-01-16) — Stable release:
+- Promoted to stable after peer review (Codex, Gemini) + Vero Certus final review
+- Used as source for PRINCIPLES.md derivation
+- No content changes from v0.3.0
 
 **v0.3.0** (2026-01-15) — Vero Certus final review remediations:
 - Added "Epistemic Status of This Section" preamble to Section 16
