@@ -340,6 +340,7 @@ Full details in `foundations/project-context.md`.
 
 **Phase 1 (Foundations)**: Complete
 **Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.0.0)
+**Phase 2.5 (PRD)**: In progress — v0.1 drafted, challenges addressed, awaiting refinement
 **Phase 3 (Implementation)**: Not started
 
 | Completed Job | Artifact |
@@ -351,6 +352,32 @@ Full details in `foundations/project-context.md`.
 | Team design research | team-design-best-practices.md |
 | Team personas creation | 6 personas in sympal-team/ |
 | PRINCIPLES.md derivation | PRINCIPLES.md v1.0.0 (ratified) |
+| PRD extraction + synthesis | prd-v0.1.md |
+| Privacy research spike | privacy-research.md |
+| Novel privacy approaches | privacy-innovations.md |
+
+---
+
+## Current Focus: PRD Completion
+
+**PRD Status**: v0.1 complete, Adversary challenges addressed, awaiting refinement + Vero review
+
+**Next steps**:
+1. PRD Refinement — integrate challenge responses into v0.2
+2. Vero Review — final check before TDD
+3. TDD — technical design for privacy architecture
+
+**Key artifacts in `foundations/working/`**:
+- `prd-extraction-notes.md` — Interview notes from Orin
+- `prd-adversary-challenges.md` — All 6 challenges + responses
+- `privacy-research.md` — Deep research on privacy approaches (~500 lines)
+- `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler
+
+**V1 Scope (revised)**:
+- M1: Todo (simple CRUD)
+- M2: Calendar (read-only Google Calendar)
+- M3: Privacy (three-tier architecture — the core innovation)
+- Email/Contacts deferred until privacy proven
 
 ---
 
@@ -365,7 +392,7 @@ principles-discussion.md (v1.2.0) + derivation-log
          ↓
 PRINCIPLES.md [BINDING] (v1.1.0)
          ↓
-PRD (via prd-tdd-plan.md) ← CURRENT
+PRD v0.1 + challenges ← CURRENT (awaiting refinement)
          ↓
 TDD
          ↓
@@ -376,4 +403,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-17*
+*Last updated: 2026-01-18*
