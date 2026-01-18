@@ -327,6 +327,8 @@ These are explicitly out of scope for V1:
 
 1. **Privacy mechanism validation** — Three-tier approach (LLM-as-compiler, semantic projection, local LLM) defined in privacy-innovations.md. TDD must validate feasibility and measure latency impact against 1.5x baseline.
 
+   **Vero review note (address in TDD)**: If three-tier approach proves infeasible, define fallback options: (a) transparency-only mode, (b) local-LLM-only for sensitive data, (c) scope reduction to low-sensitivity integrations only.
+
 2. **How to detect actionable emails vs. noise?** What's acceptable false positive/negative rate?
 
 3. **What's "good enough" categorization if not full Eisenhower?** Need to define simpler fallback.
