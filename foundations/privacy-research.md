@@ -1,7 +1,8 @@
 # Privacy-Preserving AI Research
 
+**Version**: 0.1.0
 **Date**: 2026-01-18
-**Status**: In Progress
+**Status**: Complete (informs privacy-innovations.md)
 **Purpose**: Due diligence on privacy approaches for SymPAL before committing PRD
 
 ---
@@ -558,7 +559,20 @@ Given research findings, recommend:
 
 ## Next Steps
 
-1. Return to PRD Challenges 1 & 2 with this research
-2. Propose concrete privacy approach for V1
-3. Define honest quality-privacy tradeoffs by data type
-4. Update PRD with achievable specifications
+~~1. Return to PRD Challenges 1 & 2 with this research~~ → Done: Informed `privacy-innovations.md`
+~~2. Propose concrete privacy approach for V1~~ → Done: Three-tier architecture in `privacy-innovations.md`
+~~3. Define honest quality-privacy tradeoffs by data type~~ → Done: Quality measurement methodology in `privacy-innovations.md`
+~~4. Update PRD with achievable specifications~~ → Done: PRD v0.2
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 0.1.0 | 2026-01-18 | Initial research: approaches survey, tool inventory, recommendations |
+
+---
+
+*Created: 2026-01-18*
+*Last updated: 2026-01-18*

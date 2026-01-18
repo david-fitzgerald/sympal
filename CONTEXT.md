@@ -352,26 +352,30 @@ Full details in `foundations/project-context.md`.
 | Team design research | team-design-best-practices.md |
 | Team personas creation | 6 personas in sympal-team/ |
 | PRINCIPLES.md derivation | PRINCIPLES.md v1.0.0 (ratified) |
-| PRD extraction + synthesis | prd-v0.1.md |
-| Privacy research spike | privacy-research.md |
-| Novel privacy approaches | privacy-innovations.md |
+| PRD extraction + synthesis | prd-v0.1.md → prd-v0.2.md |
+| Privacy research spike | privacy-research.md (v0.1.0) |
+| Novel privacy approaches | privacy-innovations.md (v0.2.1) |
 
 ---
 
 ## Current Focus: PRD Completion
 
-**PRD Status**: v0.1 complete, Adversary challenges addressed, awaiting refinement + Vero review
+**PRD Status**: v0.2 complete with threat model, architecture principles, clarifications integrated. Awaiting Vero review.
 
 **Next steps**:
-1. PRD Refinement — integrate challenge responses into v0.2
-2. Vero Review — final check before TDD
-3. TDD — technical design for privacy architecture
+1. Vero Review — final check before TDD
+2. TDD — technical design for privacy architecture
 
-**Key artifacts in `foundations/working/`**:
+**Key artifacts**:
+
+In `foundations/`:
+- `privacy-research.md` — Research survey on privacy approaches (v0.1.0)
+- `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler (v0.2.1)
+- `prd-v0.2.md` — PRD with threat model, architecture principles, clarifications
+
+In `foundations/working/` (process artifacts):
 - `prd-extraction-notes.md` — Interview notes from Orin
 - `prd-adversary-challenges.md` — All 6 challenges + responses
-- `privacy-research.md` — Deep research on privacy approaches (~500 lines)
-- `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler
 
 **V1 Scope (revised)**:
 - M1: Todo (simple CRUD)

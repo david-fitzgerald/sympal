@@ -16,13 +16,13 @@
 
 **Response**: ACCEPT challenge. Research completed + novel approaches developed.
 
-**Research findings** (see `foundations/working/privacy-research.md`):
+**Research findings** (see `foundations/privacy-research.md`):
 - No Free Lunch Theorem: Perfect privacy + perfect utility is mathematically impossible
 - Existing approaches have significant tradeoffs (local LLM: 10-20% gap, DP: 20-40% loss)
 - Industry converging on hybrid local+cloud architectures
 - "Swap don't blank" for PII redaction preserves context
 
-**Novel approaches developed** (see `foundations/working/privacy-innovations.md`):
+**Novel approaches developed** (see `foundations/privacy-innovations.md`):
 1. **Semantic Projection**: LLM sees typed patterns, not identities. Preserves reasoning value.
 2. **LLM as Compiler**: For structured queries, LLM returns logic, never sees data. Zero exposure.
 3. **P2P Query Mixing**: V2+ approach for multi-user anonymity.
