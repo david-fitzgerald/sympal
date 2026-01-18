@@ -1,6 +1,6 @@
 # Privacy Innovations — Novel Approaches for SymPAL
 
-**Version**: 0.2.0
+**Version**: 0.2.1
 **Date**: 2026-01-18
 **Status**: Concepts defined with critical analysis, awaiting implementation
 **Context**: These are novel approaches developed during PRD challenge phase, distinct from existing research. See `privacy-research.md` for survey of existing techniques.
@@ -29,20 +29,23 @@ We developed novel approaches that aren't in the literature. This document captu
 |-----------|---------|-----------------|
 | LLM Provider (passive) | Profile building, data monetization | Semantic Projection — they see patterns, not identities |
 | LLM Provider (active) | Deanonymization via correlation | Token rotation, query batching, timing noise |
-| Nation-state (subpoena) | Forced disclosure of accumulated data | Provider has patterns only — can't reconstruct original data |
-| Local device compromise | Full access to real data | Out of scope for V1 |
-| Network observer | Query interception | Standard TLS (not a novel concern) |
 
-### What We're NOT Defending Against
+**Core assumption**: Big tech has incentives to treat users as data products. They will do this. Design assumes providers are honest-but-curious (follow protocols, but analyze everything they legally can).
 
-- **Perfect anonymity**: A motivated nation-state with long observation may correlate patterns. Goal is practical obscurity.
-- **Malicious local code**: If user's device is compromised, all bets are off.
-- **Provider collusion**: If LLM provider actively cooperates with adversary targeting you specifically.
-- **Side-channel attacks**: Timing, power analysis, etc. beyond query-level protections.
+### Explicitly Out of Scope
+
+| Adversary | Rationale |
+|-----------|-----------|
+| Legal/subpoena compulsion | If legal proceedings target us, privacy layer isn't the defense |
+| Nation-state targeted attack | Different threat class; not our V1 problem |
+| Local device compromise | Out of scope for V1; future concern for plugin architecture |
+| Provider collusion | If provider actively cooperates with adversary targeting you specifically |
+
+**Accepted limitation**: A motivated nation-state with long observation may correlate patterns. Goal is practical obscurity, not perfect anonymity.
 
 ### Threat Model Assumptions
 
-- LLM providers are honest-but-curious (follow protocols, but may analyze data)
+- LLM providers are honest-but-curious (follow protocols, but analyze everything they legally can)
 - TLS is not broken
 - User's local environment is trusted
 - Attackers don't have access to our source code's internal mappings
@@ -620,6 +623,7 @@ These innovations are the response to:
 |---------|------|---------|
 | 0.1.0 | 2026-01-18 | Initial concepts: Semantic Projection, LLM as Compiler, P2P Mixing |
 | 0.2.0 | 2026-01-18 | Added critical analysis: threat model, prior art acknowledgment, failure modes, assumptions, sandbox spec, correlation mitigations, quality measurement, entity taxonomy |
+| 0.2.1 | 2026-01-18 | Aligned threat model with PRD v0.2 (nation-state, legal, local device explicitly out of scope) |
 
 ---
 
