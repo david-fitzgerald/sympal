@@ -179,8 +179,8 @@ def find_neglected_meeting_contacts(calendar, emails, date_range, inactive_days)
     cutoff = today() - days(inactive_days)
     neglected = [a for a in attendees if last_contact.get(a, MIN_DATE) < cutoff]
 
-    return [e for e in upcoming if any(a in neglected for a in e.attendees)]
-```
+    return [e for e in upcoming if any(a in neglected for a in e.attendees)]```
+    
 
 **User runs locally** with real data. LLM never saw calendar or emails.
 
@@ -193,6 +193,7 @@ def find_neglected_meeting_contacts(calendar, emails, date_range, inactive_days)
 - Query patterns inform knowledge graph schema
 
 ---
+
 
 ## Novel Approach 3: P2P Query Mixing (V2+)
 
