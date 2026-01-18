@@ -327,7 +327,9 @@ Before marking synthesis complete:
 
 ## Output
 
-Save the draft PRD to: `foundations/prd-v0.1.md`
+Save the draft PRD to: `foundations/prd.md`
+
+**Naming convention**: Foundational docs use version in header only (e.g., "Version: 0.1.0"), not in filename. Git tracks history.
 
 Mark status as: "Draft (Synthesis complete, awaiting Checkpoint)"
 

@@ -256,11 +256,19 @@ Two-phase testing for personas (from `prompts/reference/testing-patterns.md`):
 
 ### Versioning
 
-- **YAML front matter** in files for version/status
+- **Semantic versioning**: Always MAJOR.MINOR.PATCH (e.g., 0.2.0, not 0.2)
 - **Git tags** for milestones
-- **Semantic versioning**: MAJOR (hard constraint changes), MINOR (framework changes), PATCH (operational)
+- **Foundational docs** maintain in-doc Version History section for readers without git access
 
-**Foundational docs** maintain in-doc Version History section for readers without git access.
+**Naming conventions**:
+
+| Type | Filename | Version Location | Old Versions |
+|------|----------|------------------|--------------|
+| Foundational docs | No version in name (e.g., `prd.md`) | Header + Version History | Git history |
+| Personas/prompts | Version in filename (e.g., `vale-v1.1.md`) | Filename + header | Keep if needed |
+| Reviews | Reference doc version (e.g., `vero-review-prd-v0.2.md`) | Filename | Keep (audit trail) |
+
+**Rationale**: Foundational docs evolve in place — git tracks history. Personas are loaded as artifacts — version in filename aids selection. Reviews are audit snapshots.
 
 ### Voice Registers
 
@@ -352,7 +360,7 @@ Full details in `foundations/project-context.md`.
 | Team design research | team-design-best-practices.md |
 | Team personas creation | 6 personas in sympal-team/ |
 | PRINCIPLES.md derivation | PRINCIPLES.md v1.0.0 (ratified) |
-| PRD extraction + synthesis | prd-v0.1.md → prd-v0.2.md |
+| PRD extraction + synthesis | prd.md (v0.2.0) |
 | Privacy research spike | privacy-research.md (v0.1.0) |
 | Novel privacy approaches | privacy-innovations.md (v0.2.1) |
 
@@ -360,18 +368,17 @@ Full details in `foundations/project-context.md`.
 
 ## Current Focus: PRD Completion
 
-**PRD Status**: v0.2 complete with threat model, architecture principles, clarifications integrated. Awaiting Vero review.
+**PRD Status**: v0.2.0 complete. Vale checkpoint passed. Vero review complete (SHIP with noted concern). Ready for TDD.
 
 **Next steps**:
-1. Vero Review — final check before TDD
-2. TDD — technical design for privacy architecture
+1. TDD — technical design for privacy architecture
 
 **Key artifacts**:
 
 In `foundations/`:
+- `prd.md` — Product Requirements Document (v0.2.0)
 - `privacy-research.md` — Research survey on privacy approaches (v0.1.0)
 - `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler (v0.2.1)
-- `prd-v0.2.md` — PRD with threat model, architecture principles, clarifications
 
 In `foundations/working/` (process artifacts):
 - `prd-extraction-notes.md` — Interview notes from Orin
