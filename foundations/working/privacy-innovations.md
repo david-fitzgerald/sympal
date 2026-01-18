@@ -1,7 +1,8 @@
 # Privacy Innovations — Novel Approaches for SymPAL
 
+**Version**: 0.2.0
 **Date**: 2026-01-18
-**Status**: Concepts defined, awaiting implementation
+**Status**: Concepts defined with critical analysis, awaiting implementation
 **Context**: These are novel approaches developed during PRD challenge phase, distinct from existing research. See `privacy-research.md` for survey of existing techniques.
 
 ---
@@ -15,6 +16,36 @@ The privacy research revealed that existing approaches have significant tradeoff
 - **HE/MPC**: Not practical for interactive use
 
 We developed novel approaches that aren't in the literature. This document captures them for V1 implementation and future development.
+
+**Important**: These are applied innovations, not fundamental research. Section-specific limitations, assumptions, and failure modes are documented throughout. See [Open Questions](#open-questions) for unresolved issues.
+
+---
+
+## Threat Model
+
+### What We're Defending Against
+
+| Adversary | Concern | Design Response |
+|-----------|---------|-----------------|
+| LLM Provider (passive) | Profile building, data monetization | Semantic Projection — they see patterns, not identities |
+| LLM Provider (active) | Deanonymization via correlation | Token rotation, query batching, timing noise |
+| Nation-state (subpoena) | Forced disclosure of accumulated data | Provider has patterns only — can't reconstruct original data |
+| Local device compromise | Full access to real data | Out of scope for V1 |
+| Network observer | Query interception | Standard TLS (not a novel concern) |
+
+### What We're NOT Defending Against
+
+- **Perfect anonymity**: A motivated nation-state with long observation may correlate patterns. Goal is practical obscurity.
+- **Malicious local code**: If user's device is compromised, all bets are off.
+- **Provider collusion**: If LLM provider actively cooperates with adversary targeting you specifically.
+- **Side-channel attacks**: Timing, power analysis, etc. beyond query-level protections.
+
+### Threat Model Assumptions
+
+- LLM providers are honest-but-curious (follow protocols, but may analyze data)
+- TLS is not broken
+- User's local environment is trusted
+- Attackers don't have access to our source code's internal mappings
 
 ---
 
@@ -71,6 +102,20 @@ The LLM reasons over the shadow. The reasoning transfers to real data. The LLM n
 
 4. **Rehydration**: Map LLM response back to real entities
 
+### Prior Art & What's Actually Novel
+
+**Established techniques**:
+- Pseudonymization with typed placeholders (arXiv:2502.15233 and others)
+- Named Entity Recognition for PII detection (mature field)
+- Context-preserving anonymization (active research area)
+
+**What's novel in our approach**:
+- **Richer type vocabulary** derived from personal knowledge graph (not generic NER categories)
+- **Rehydration workflow** that maps LLM responses back to real entities
+- **Privacy-first framing** — existing work optimizes for accuracy; we optimize for non-reversibility
+
+**Honest framing**: This is applied innovation combining proven techniques in a novel workflow, not fundamental research.
+
 ### What The LLM Provider Accumulates
 
 Over time they learn you have:
@@ -85,14 +130,25 @@ But they can NEVER know:
 
 You become statistically indistinguishable from millions of others.
 
-### Challenges
+### Failure Modes & Limitations
 
-1. **Projection quality**: Local model must correctly type entities
-2. **Novel entities**: First mention of someone needs inference or user input
-3. **Cross-reference attacks**: Correlation across queries could leak identity
-   - Mitigation: Rotate placeholder tokens periodically
-4. **Content tasks**: "Summarize this email" needs actual text
-   - Mitigation: Use local LLM for content tasks
+| Failure Mode | Severity | Mitigation | Residual Risk |
+|--------------|----------|------------|---------------|
+| Type vocabulary leaks identity | High | Limit specificity; coarsen rare combinations | Highly specific types (e.g., `[PERSON:colleague,neurosurgeon,marathon-runner]`) may be unique |
+| Cross-query correlation | High | Token rotation + batching | Long-term patterns still observable |
+| NER accuracy gap | Medium | User review of first mentions | Missed entities leak to LLM |
+| Rehydration ambiguity | Medium | Session-scoped mappings with context | "The colleague" may be ambiguous if multiple mentioned |
+| Novel entities (no prior type) | Medium | Default to generic type + user prompt | New contacts require classification |
+| Content tasks bypass projection | Low | Route to local LLM | Quality tradeoff for content tasks |
+
+### Assumptions
+
+| Assumption | Status | Validation Path |
+|------------|--------|-----------------|
+| Local models can type entities accurately | Unvalidated | Benchmark on personal data samples |
+| Type vocabulary balances richness ↔ genericity | Unvalidated | User study on projection quality |
+| Users accept first-mention classification prompts | Unvalidated | Dogfooding feedback |
+| Rehydration rarely ambiguous in practice | Unvalidated | Log ambiguity rate post-launch |
 
 ### V1 Implementation Priority
 
@@ -129,6 +185,20 @@ The LLM is a **reasoning consultant** who helps build tools but never sees your 
 - Zero data exposure (not reduced — zero)
 - LLM output is reusable (same logic applies to future queries)
 - Builds a library of local capabilities over time
+
+### Prior Art & What's Actually Novel
+
+**Established techniques**:
+- NL2SQL is mature — AWS, Oracle, Microsoft have production systems
+- Text-to-code generation (Codex, StarCoder, etc.)
+- Schema-based query generation
+
+**What's novel in our approach**:
+- **Privacy framing**: Existing systems optimize for accuracy; we optimize for zero data exposure
+- **Personal data context**: Schema descriptions include relationship semantics, not just column types
+- **Hybrid routing**: Compiler for structured, projection for reasoning, local for content
+
+**Honest framing**: This is proven technology in a novel application context. The innovation is the routing architecture, not the compilation itself.
 
 ### What It Works For
 
@@ -179,10 +249,50 @@ def find_neglected_meeting_contacts(calendar, emails, date_range, inactive_days)
     cutoff = today() - days(inactive_days)
     neglected = [a for a in attendees if last_contact.get(a, MIN_DATE) < cutoff]
 
-    return [e for e in upcoming if any(a in neglected for a in e.attendees)]```
-    
+    return [e for e in upcoming if any(a in neglected for a in e.attendees)]
+```
 
 **User runs locally** with real data. LLM never saw calendar or emails.
+
+### Failure Modes & Limitations
+
+| Failure Mode | Severity | Mitigation | Residual Risk |
+|--------------|----------|------------|---------------|
+| Vulnerable code generation | High (12-65% of LLM code has vulnerabilities per research) | AST sandbox with strict allowlist | Some vulnerability classes may slip through |
+| Package hallucination | High (44% per research) | No external imports allowed | Limits expressiveness |
+| Logic errors in generated code | Medium | Test with sample data; user verification | Silent wrong answers |
+| Query too complex for compiler | Medium | Fallback to projection | May require multiple round trips |
+| Schema description leaks info | Low | Describe shapes, not examples | Very generic schemas only |
+
+### Sandbox Architecture
+
+**V1 Specification: AST Parsing with Allowlist**
+
+1. **Parse** generated code as Python AST
+2. **Validate** against strict allowlist:
+   - **Allowed**: list comprehensions, dict operations, basic math, datetime operations, string methods
+   - **Disallowed**:
+     - Imports (except: `datetime`, `math`, `collections`)
+     - File I/O (`open`, `read`, `write`, path operations)
+     - Network (`socket`, `urllib`, `requests`, etc.)
+     - Exec/eval (`exec`, `eval`, `compile`)
+     - System access (`os`, `sys`, `subprocess`)
+   - **Capped**: Max 10,000 iterations per loop
+3. **Execute** in restricted namespace (only our data accessors available)
+4. **Timeout**: 5 seconds max execution
+
+**On validation failure**: Return error, don't execute, log for analysis.
+
+**Future V2**: Consider WebAssembly sandbox for stronger isolation.
+
+### Assumptions
+
+| Assumption | Status | Validation Path |
+|------------|--------|-----------------|
+| 60-70% of queries are structured | No citation | Measure query distribution post-launch |
+| AST allowlist catches dangerous patterns | Unvalidated | Security review + fuzzing |
+| 5-second timeout sufficient | Reasonable | Adjust based on real query complexity |
+| Schema descriptions don't leak identity | Probable | Audit schema generation |
 
 ### V1 Implementation Priority
 
@@ -193,7 +303,6 @@ def find_neglected_meeting_contacts(calendar, emails, date_range, inactive_days)
 - Query patterns inform knowledge graph schema
 
 ---
-
 
 ## Novel Approach 3: P2P Query Mixing (V2+)
 
@@ -214,12 +323,14 @@ User C: query about contacts
 - Mixer knows who asked but not responses
 - LLM sees queries and responses but not who
 
-### Challenges
+### Limitations (V2+ Scope)
 
-- Need critical mass of simultaneous users
-- Queries should be similar enough to batch
-- Timing attacks if low activity
-- Trust in mixer (or need distributed mixing)
+| Limitation | Severity | Mitigation |
+|------------|----------|------------|
+| Need critical mass of simultaneous users | High | Defer to V2 when user base exists |
+| Queries should be similar enough to batch | Medium | Batch by query type |
+| Timing attacks if low activity | High | Add dummy queries during low periods |
+| Trust in mixer | High | Distributed mixing protocol needed |
 
 ### Alternative: Distributed Entity Typing
 
@@ -305,36 +416,210 @@ Run locally      Rehydrate         Direct
 - Content task routing
 - Quality comparison logging (to validate tradeoffs)
 
+### PRD Integration
+
+| PRD Milestone | Privacy Phase | What's Tested |
+|---------------|---------------|---------------|
+| M1-M2 | — | Low sensitivity data only |
+| M3 | A: Compiler | Structured queries with zero exposure |
+| M3 | B: Projection | Reasoning queries with shadow data |
+| M3 | C: Local LLM | Content tasks with local processing |
+| M5-M6 | Full | Email + contacts (high sensitivity) |
+
+**Gate**: M5 (Email) only proceeds after M3 privacy architecture validated.
+
 ### V2+
 
 - P2P query mixing (when users exist)
 - Distributed entity typing
 - Federated learning across SymPAL instances
-- Projection token rotation (anti-correlation)
+- Advanced correlation attack mitigations
+
+---
+
+## Correlation Attack Mitigations
+
+### The Risk
+
+Even with perfect projection, query patterns over time can be correlated:
+- Same type combinations appearing together
+- Query timing patterns
+- Response latency signatures
+
+### V1 Mitigations
+
+| Mitigation | Implementation | Privacy Gain |
+|------------|----------------|--------------|
+| Token rotation | Daily epoch marker in placeholders | Prevents cross-session correlation |
+| Query batching | Batch 2-5 queries when possible | Obscures individual query patterns |
+| Timing noise | 100-500ms random delay | Defeats timing analysis |
+
+### V2 Mitigations (If Needed)
+
+| Mitigation | Implementation | Privacy Gain |
+|------------|----------------|--------------|
+| Query padding | Add plausible dummy queries | Obscures true query volume |
+| Multi-provider distribution | Split queries across providers | No single provider sees all patterns |
+| Decoy sessions | Periodic automated query bursts | Camouflages real usage patterns |
+
+### Accepted Limitation
+
+A motivated nation-state with long observation windows and access to provider logs may still correlate patterns. **Goal is practical obscurity, not perfect anonymity.**
+
+This is acceptable because:
+- Most users aren't nation-state targets
+- Provider passive accumulation is the primary threat
+- Even partial correlation requires significant effort
+
+---
+
+## Quality Measurement Methodology
+
+### Why Measurement Matters
+
+Privacy approaches are worthless if they destroy utility. We must measure quality impact empirically.
+
+### Metrics
+
+| Dimension | Metric | Target | How Measured |
+|-----------|--------|--------|--------------|
+| Task completion | Binary success | >95% | Did the query return a usable answer? |
+| Reasoning quality | 1-5 subjective scale | >3.5 average | User rating on sample |
+| Latency | End-to-end time | <5s simple, <15s complex | Instrumentation |
+| Routing accuracy | Correct tier? | >80% | Manual audit of sample |
+| Compiler validity | Code executes? | >90% | Execution success rate |
+| Projection fidelity | Rehydration correct? | >95% | Spot-check sample |
+
+### Protocol
+
+1. **Log** all queries, tier decisions, execution results (locally)
+2. **Weekly sample** 20 queries for manual quality rating
+3. **Compare** to baseline (raw Claude API with full data)
+4. **Adjust** thresholds based on findings
+
+### Baseline Comparison
+
+For each query type, run same query through:
+- Raw LLM (full data exposure) — quality ceiling
+- Privacy tier (compiler/projection/local) — actual
+
+Quality delta should be <10% for projection, <20% for local. Compiler should be ~0% (logic is logic).
+
+---
+
+## Entity Taxonomy Specification
+
+### Purpose
+
+Standardize the type vocabulary for semantic projection. Balance expressiveness with privacy (too specific = identifying).
+
+### Categories
+
+| Category | Types | Example Placeholder |
+|----------|-------|---------------------|
+| PERSON | colleague, friend, family, acquaintance, vendor, client, executive | `[PERSON:colleague,senior]` |
+| ORGANIZATION | employer, client, vendor, partner, government | `[ORG:client]` |
+| PROJECT | business, personal, learning, health, financial | `[PROJECT:business,deadline-driven]` |
+| LOCATION | home, work, travel, event | `[LOCATION:work]` |
+| TIME | recent, upcoming, deadline, recurring, historical | `[TIME:upcoming,deadline]` |
+| PRIORITY | urgent, important, routine, low | `[PRIORITY:urgent]` |
+| TOPIC | business, personal, health, financial, legal, technical | `[TOPIC:business,sensitive]` |
+
+### Rules
+
+1. **Max 3 type modifiers** per entity — more is likely identifying
+2. **Coarsen rare combinations** — if a type combo appears <5 times in your data, use parent type
+3. **No proper nouns** ever in types — "startup" not "YCombinator-company"
+4. **Daily token rotation** — placeholder tokens reset each epoch
+5. **Session-scoped mappings** — rehydration maps valid only within session
+
+### Examples
+
+| Real Entity | Projection | Why |
+|-------------|------------|-----|
+| "John Smith, CEO of Acme" | `[PERSON:colleague,senior,frequent]` | Role + relationship, not identity |
+| "Dr. Sarah Chen, my therapist" | `[PERSON:professional,health]` | Coarsened — "therapist" alone might be identifying |
+| "Project Nightingale Q4 launch" | `[PROJECT:business,deadline-driven]` | Generic business project |
+| "mom's birthday party" | `[PERSON:family] + [EVENT:personal,upcoming]` | Split into typed components |
 
 ---
 
 ## Open Questions
 
-1. **Query classification accuracy**: How reliably can we route queries to the right tier?
+### Resolved in This Version
 
-2. **Projection granularity**: How specific should type tags be? `[PERSON]` vs `[PERSON:colleague,senior,trusted]`?
+| Question | Resolution |
+|----------|------------|
+| Compiler output safety | AST sandbox with allowlist (see [Sandbox Architecture](#sandbox-architecture)) |
+| Cross-query correlation | Token rotation + batching + timing noise (see [Correlation Attack Mitigations](#correlation-attack-mitigations)) |
+| Quality measurement | Protocol defined (see [Quality Measurement Methodology](#quality-measurement-methodology)) |
+| Projection granularity | Max 3 modifiers, coarsen rare combos (see [Entity Taxonomy](#entity-taxonomy-specification)) |
 
-3. **Knowledge graph bootstrapping**: How does the graph get populated initially? User effort vs inference?
+### Still Open
 
-4. **Compiler output safety**: How do we sandbox LLM-generated code safely?
+1. **Query classification accuracy**: How reliably can we route queries to the right tier? Requires implementation to measure.
 
-5. **Cross-query correlation**: How often do we rotate placeholder tokens to prevent correlation attacks?
+2. **Knowledge graph bootstrapping**: How does the graph get populated initially? Options:
+   - User effort (explicit classification)
+   - Inference from existing data
+   - Hybrid with user confirmation
 
-6. **Quality measurement**: How do we measure actual quality impact of each approach?
+   Defer decision until Phase B.
+
+3. **Local LLM quality floor**: At what quality level does local LLM become unusable? Need empirical testing with Ollama/Llama models.
+
+4. **Provider trust verification**: How do we verify providers aren't doing undisclosed analysis? May require cryptographic approaches (V2+).
 
 ---
 
 ## Relationship to PRD Challenges
 
 These innovations are the response to:
-- **Challenge 1**: Privacy layer is a black box → Now defined as three-tier architecture
-- **Challenge 2**: Quality degradation may be fantasy → Honest tradeoffs by task type
+- **Challenge 1**: Privacy layer is a black box → Now defined as three-tier architecture with explicit threat model
+- **Challenge 2**: Quality degradation may be fantasy → Honest tradeoffs by task type with measurement protocol
+
+---
+
+## References
+
+### Privacy & Anonymization
+
+- arXiv:2502.15233 — Pseudonymization techniques with typed placeholders
+- "A Survey on Privacy-Preserving Techniques for NLP" — context-preserving anonymization approaches
+- k-anonymity, l-diversity literature — foundational privacy concepts
+
+### NL2SQL & Code Generation
+
+- AWS Athena, Oracle APEX, Microsoft Copilot — production NL2SQL systems
+- "A Survey on Text-to-SQL Parsing" — comprehensive NL2SQL review
+- StarCoder, CodeLlama — open code generation models
+
+### LLM Security
+
+- "Do Users Write More Insecure Code with AI Assistants?" — 12-65% vulnerability rate
+- "An Empirical Study on LLM Hallucination in Code Generation" — 44% package hallucination
+- OWASP LLM Top 10 — security considerations for LLM applications
+
+### Sandbox & Isolation
+
+- Python RestrictedPython — AST-based sandboxing
+- WebAssembly isolation — stronger sandbox option
+- seccomp, AppArmor — OS-level isolation (may be relevant for V2)
+
+### Correlation Attacks
+
+- Differential privacy literature — formal privacy guarantees
+- Traffic analysis research — timing and pattern correlation
+- "Website Fingerprinting" literature — analogous correlation attacks
+
+---
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 0.1.0 | 2026-01-18 | Initial concepts: Semantic Projection, LLM as Compiler, P2P Mixing |
+| 0.2.0 | 2026-01-18 | Added critical analysis: threat model, prior art acknowledgment, failure modes, assumptions, sandbox spec, correlation mitigations, quality measurement, entity taxonomy |
 
 ---
 
