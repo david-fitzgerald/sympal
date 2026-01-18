@@ -366,29 +366,44 @@ Full details in `foundations/project-context.md`.
 
 ---
 
-## Current Focus: PRD Completion
+## Current Focus: TDD Challenge Phase
 
-**PRD Status**: v0.2.0 complete. Vale checkpoint passed. Vero review complete (SHIP with noted concern). Ready for TDD.
+**TDD Status**: v0.2.0 complete. Vale checkpoint passed. Adversary challenges raised (6 challenges). Working through responses.
 
 **Next steps**:
-1. TDD — technical design for privacy architecture
+1. Address Adversary challenges (6 open — start with Challenge 1: query distribution assumption)
+2. Refinement phase
+3. Vero review
 
 **Key artifacts**:
 
 In `foundations/`:
 - `prd.md` — Product Requirements Document (v0.2.0)
+- `tdd.md` — Technical Design Document (v0.2.0)
 - `privacy-research.md` — Research survey on privacy approaches (v0.1.0)
 - `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler (v0.2.1)
 
 In `foundations/working/` (process artifacts):
 - `prd-extraction-notes.md` — Interview notes from Orin
-- `prd-adversary-challenges.md` — All 6 challenges + responses
+- `prd-adversary-challenges.md` — All 6 PRD challenges + responses
+- `tdd-extraction-notes.md` — Interview notes from Kael + Ryn
+- `tdd-adversary-challenges.md` — 6 TDD challenges (all open, working through)
 
 **V1 Scope (revised)**:
 - M1: Todo (simple CRUD)
 - M2: Calendar (read-only Google Calendar)
 - M3: Privacy (three-tier architecture — the core innovation)
 - Email/Contacts deferred until privacy proven
+
+**Adversary Challenges Summary** (all open):
+| # | Challenge | Severity |
+|---|-----------|----------|
+| 1 | Query distribution assumption (60-70% structured) unvalidated | High |
+| 2 | Projection quality has no threshold | High |
+| 3 | Sandbox permissions unspecified | High |
+| 4 | Default-to-private not in architecture | Medium |
+| 5 | Correlation mitigations missing | Medium |
+| 6 | No failure thresholds defined | Medium |
 
 ---
 
@@ -414,4 +429,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-18*
+*Last updated: 2026-01-18 (evening — TDD challenge phase in progress)*
