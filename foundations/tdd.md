@@ -1,8 +1,8 @@
 # SymPAL Technical Design Document
 
-**Version:** 1.0.0
+**Version:** 1.0.2
 **Date:** 2026-01-19
-**Status:** Draft (Fresh synthesis, awaiting Checkpoint)
+**Status:** Draft (Vale + Adversary passed, awaiting Vero)
 **Author:** Kael + Ryn (synthesis from Lead Dev interview + delta)
 **PRD Reference:** foundations/prd.md (v0.3.0)
 **Privacy Reference:** foundations/privacy-innovations.md (v3.0.0)
@@ -217,6 +217,13 @@ condition   := field operator value
 operator    := "=" | "!=" | ">" | "<" | ">=" | "<=" | "CONTAINS" | "IN"
 ```
 
+**Intentional Limitations** (V1):
+- No JOIN (cross-table queries route to Ephemeral Slots)
+- No GROUP BY (aggregation by category routes to Ephemeral Slots)
+- No subqueries (complex filters route to Ephemeral Slots)
+
+These limitations are acceptable for V1. If >30% of "structured-looking" queries can't be expressed in SymQL, expand grammar in V1.5.
+
 **Example**:
 - Input: "How many meetings do I have next week?"
 - Generated: `SELECT COUNT(*) FROM calendar WHERE start_date >= '2026-01-20' AND start_date < '2026-01-27' AND type = 'meeting'`
@@ -268,6 +275,17 @@ Escalation only if quality degrades (rare with good defaults).
 - LLM response must use exact placeholder format: `[E1]`, `[E2]`
 - Structured output (JSON) preferred for reliable parsing
 - Fallback cascade: retry prompt → local LLM → partial result with warning
+
+**Rehydration Failure Categories**:
+
+| Category | Example | Detectable? | Severity |
+|----------|---------|-------------|----------|
+| Missing placeholder | LLM says "your colleague" instead of `[E1]` | Yes (regex) | Low — shows anonymized |
+| Wrong placeholder | `[E1]` used where `[E2]` meant | Partial | High — wrong advice looks correct |
+| Self-reference | `[E1] should meet with [E1]` | Yes (duplicate check) | Medium |
+| Format corruption | `[E 1]` or `E1` | Yes (regex) | Low |
+
+**Mitigation for "wrong placeholder"**: If response references placeholder in semantically inconsistent context (e.g., legend says `[E1]` is a person but response says "the project [E1]"), flag for user review rather than auto-rehydrating.
 
 ### Tier 3: Local LLM (Zero Exposure)
 
@@ -395,7 +413,7 @@ CREATE TABLE calendar_events (
 
 | Actor | Motivation | In Scope? | Mitigation |
 |-------|------------|-----------|------------|
-| LLM Provider (passive) | Profile building | Yes | Ephemeral Slots — single-use placeholders defeat entity tracking |
+| LLM Provider (passive) | Profile building | Yes | Ephemeral Slots defeat entity-level correlation; behavioral patterns remain visible (mitigated by token rotation, timing noise) |
 | LLM Provider (active) | Deanonymization via correlation | Yes | Token rotation (daily), query batching, timing noise |
 | Nation-state | Targeted surveillance | No | Out of scope for V1 |
 | Local attacker | Device access | No | Out of scope for V1 |
@@ -462,7 +480,8 @@ CREATE TABLE calendar_events (
 - [ ] SQLite setup with schema
 - [ ] Basic todo CRUD (`sympal todo add/list/done/delete`)
 - [ ] Config file handling (`~/.sympal/config.yaml`)
-- [ ] Logging infrastructure
+- [ ] Logging infrastructure (`~/.sympal/sympal.log`)
+- [ ] `sympal log` command (view recent queries, supports P10 user control)
 
 **Gate**: Todo CRUD works end-to-end
 
@@ -475,6 +494,11 @@ CREATE TABLE calendar_events (
 
 **Gate**: Can view today's calendar and todos together
 
+**Calendar Write Controls** (V1):
+- **Supported**: Create events only (no modify, no delete in V1)
+- **Confirmation**: All event creation requires explicit user confirmation before API call
+- **Attendees**: Out of scope for V1 (no sending invites on user's behalf)
+
 ### Phase 3: DSL Compilation (M3)
 
 - [ ] Query Classifier (keyword cascade)
@@ -485,7 +509,7 @@ CREATE TABLE calendar_events (
 - [ ] Code validation → execution pipeline
 - [ ] Test with todo + calendar queries
 
-**Gate**: >90% of structured queries return correct results
+**Gate**: >90% of structured queries return correct results; test suite includes 20 real-world queries with >80% expressible in SymQL
 
 ### Phase 4: Ephemeral Slots (M4)
 
@@ -506,7 +530,7 @@ CREATE TABLE calendar_events (
 - [ ] Quality logging
 - [ ] Daily use begins
 
-**Gate**: Lead Dev uses daily (subjective)
+**Gate**: Lead Dev uses daily AND ≥50% of LLM queries route through DSL or Ephemeral Slots (not Local-only fallback)
 
 ### Dependency Graph
 
@@ -567,6 +591,7 @@ M5 (Local LLM + Integration)
 | Query routing accuracy | >80% | Log analysis |
 | DSL execution success | >90% | Sandbox logs |
 | Rehydration accuracy | >95% | Sample review |
+| UNCERTAIN fallback rate | <20% | Log analysis |
 | Latency (simple) | <5s | Instrumentation |
 | Latency (complex) | <15s | Instrumentation |
 | Latency vs baseline | ≤1.5x Claude | Benchmark |
@@ -578,6 +603,7 @@ M5 (Local LLM + Integration)
 | DSL execution | >90% | <80% | Debug compiler, tighten SymQL grammar |
 | Rehydration accuracy | >95% | <90% | Review NER, simplify entity types |
 | Routing accuracy | >80% | <70% | Revisit classifier keywords |
+| UNCERTAIN fallback | <20% | >30% | Expand classifier keywords or add local LLM classifier |
 | Latency (simple) | <5s | >10s | Profile pipeline |
 
 ### Dogfooding Validity
@@ -596,6 +622,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 | Sandbox | Deno subprocess | Built-in deny-by-default |
 | Database | SQLite (graph schema) | Queryable + relationships |
 | Local LLM | Ollama + Llama 3.2 3B | Fits 8GB RAM |
+| Cloud LLM | Claude (hardcoded V1) | V1 simplicity; abstraction layer is V2 scope (P3 deferred) |
 | OAuth storage | System keychain | OS-managed security |
 | CLI style | Subcommands | Simple, no state |
 | Query classifier | Keyword cascade | Zero latency, deterministic |
@@ -632,6 +659,8 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.2 | 2026-01-19 | Adversary challenge fixes: (1) Added UNCERTAIN fallback rate metric (<20%) with circuit breaker; (2) Added rehydration failure categories with "wrong placeholder" mitigation; (3) Fixed correlation claim to include behavioral pattern caveat; (4) Made M5 gate objective (≥50% queries via DSL/Ephemeral Slots); (5) Documented SymQL intentional limitations, added expressiveness test to M3; (6) Specified calendar write controls (create only, confirmation required, no attendees). |
+| 1.0.1 | 2026-01-19 | Vale checkpoint fixes: (1) Added `sympal log` command to M1 for P10 user control; (2) Clarified Cloud LLM decision — V1 hardcodes Claude, abstraction layer is V2 scope (P3 deferred). |
 | 1.0.0 | 2026-01-19 | Fresh synthesis from extraction notes + privacy-innovations v3.0.0 + delta interview. Key changes: Three-tier → DSL/Ephemeral Slots/Local (no PaaP in V1); Semantic Projection → Ephemeral Slots; Added Query Classifier spec; Added cost model; Added failure UX; Added milestone gates; Task-based legend defaults; Skip NER review for known entities. |
 | 0.2.0 | 2026-01-18 | Previous version (superseded) |
 | 0.1.0 | 2026-01-18 | Initial synthesis |
