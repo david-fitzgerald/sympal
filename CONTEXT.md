@@ -12,9 +12,10 @@
 
 **This session, you should**:
 1. Read this file first
-2. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task
-3. Reference PRINCIPLES.md for any design decisions
-4. Use personas for review/challenge work (not creation)
+2. Read `foundations/implementation-plan.md` for current milestone and learning approach
+3. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task
+4. Reference PRINCIPLES.md for any design decisions
+5. Use personas for review/challenge work (not creation)
 
 ---
 
@@ -377,7 +378,8 @@ Full details in `foundations/project-context.md`.
 
 **Next steps**:
 1. Start M1: Foundation (Go scaffolding, SQLite, Todo CRUD)
-2. Follow Implementation Plan in TDD (M1 → M2 → M3 → M4 → M5)
+2. Follow `foundations/implementation-plan.md` for milestone details and learning approach
+3. TDD has technical specs; implementation-plan.md has session workflow
 
 **Key artifacts**:
 
@@ -421,4 +423,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-19 (TDD complete, ready for implementation)*
+*Last updated: 2026-01-20 (Implementation plan added)*
