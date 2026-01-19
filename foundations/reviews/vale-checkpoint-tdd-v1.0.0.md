@@ -116,3 +116,7 @@ Both concerns are **scope clarifications, not principle violations**. Challenge 
 ---
 
 *Reviewed by Vale — "Is this coherent?" — Yes, with minor clarification needed.*
+
+---
+
+**Resolution Note (2026-01-19)**: Both concerns addressed in TDD v1.0.1. See version history in tdd.md.

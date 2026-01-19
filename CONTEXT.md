@@ -347,9 +347,10 @@ Full details in `foundations/project-context.md`.
 ## Project Status
 
 **Phase 1 (Foundations)**: Complete
-**Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.0.0)
-**Phase 2.5 (PRD)**: In progress — v0.1 drafted, challenges addressed, awaiting refinement
-**Phase 3 (Implementation)**: Not started
+**Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.1.0)
+**Phase 2.5 (PRD)**: Complete — prd.md v0.3.0 (Vale + Vero reviewed)
+**Phase 2.6 (TDD)**: Complete — tdd.md v1.0.3 (Vale + Adversary + Vero reviewed)
+**Phase 3 (Implementation)**: Ready to start
 
 | Completed Job | Artifact |
 |---------------|----------|
@@ -359,51 +360,44 @@ Full details in `foundations/project-context.md`.
 | Project context | project-context.md v1.1.0 |
 | Team design research | team-design-best-practices.md |
 | Team personas creation | 6 personas in sympal-team/ |
-| PRINCIPLES.md derivation | PRINCIPLES.md v1.0.0 (ratified) |
-| PRD extraction + synthesis | prd.md (v0.2.0) |
-| Privacy research spike | privacy-research.md (v0.1.0) |
-| Novel privacy approaches | privacy-innovations.md (v0.2.1) |
+| PRINCIPLES.md derivation | PRINCIPLES.md v1.1.0 (ratified) |
+| PRD extraction + synthesis | prd.md v0.3.0 |
+| Privacy research spike | privacy-research.md v0.1.0 |
+| Novel privacy approaches | privacy-innovations.md v3.0.0 |
+| TDD extraction + synthesis | tdd.md v1.0.3 (Final) |
 
 ---
 
-## Current Focus: TDD Challenge Phase
+## Current Focus: Ready for Implementation
 
-**TDD Status**: v0.2.0 complete. Vale checkpoint passed. Adversary challenges raised (6 challenges). Working through responses.
+**Design phase complete**. All foundational documents reviewed and finalized:
+- PRD v0.3.0 — What we're building
+- TDD v1.0.3 — How we're building it
+- privacy-innovations.md v3.0.0 — Privacy architecture details
 
 **Next steps**:
-1. Address Adversary challenges (6 open — start with Challenge 1: query distribution assumption)
-2. Refinement phase
-3. Vero review
+1. Start M1: Foundation (Go scaffolding, SQLite, Todo CRUD)
+2. Follow Implementation Plan in TDD (M1 → M2 → M3 → M4 → M5)
 
 **Key artifacts**:
 
 In `foundations/`:
-- `prd.md` — Product Requirements Document (v0.2.0)
-- `tdd.md` — Technical Design Document (v0.2.0)
-- `privacy-research.md` — Research survey on privacy approaches (v0.1.0)
-- `privacy-innovations.md` — Novel approaches: Semantic Projection, LLM as Compiler (v0.2.1)
+- `prd.md` — Product Requirements Document (v0.3.0)
+- `tdd.md` — Technical Design Document (v1.0.3, Final)
+- `privacy-research.md` — Research survey (v0.1.0)
+- `privacy-innovations.md` — Privacy architecture (v3.0.0)
 
-In `foundations/working/` (process artifacts):
-- `prd-extraction-notes.md` — Interview notes from Orin
-- `prd-adversary-challenges.md` — All 6 PRD challenges + responses
-- `tdd-extraction-notes.md` — Interview notes from Kael + Ryn
-- `tdd-adversary-challenges.md` — 6 TDD challenges (all open, working through)
+In `foundations/reviews/`:
+- `vale-checkpoint-tdd-v1.0.0.md` — Principles checkpoint
+- `adversary-challenge-tdd-v1.0.1.md` — Systematic critique
+- `vero-review-tdd-v1.0.2.md` — Final review
 
-**V1 Scope (revised)**:
-- M1: Todo (simple CRUD)
-- M2: Calendar (read-only Google Calendar)
-- M3: Privacy (three-tier architecture — the core innovation)
-- Email/Contacts deferred until privacy proven
-
-**Adversary Challenges Summary** (all open):
-| # | Challenge | Severity |
-|---|-----------|----------|
-| 1 | Query distribution assumption (60-70% structured) unvalidated | High |
-| 2 | Projection quality has no threshold | High |
-| 3 | Sandbox permissions unspecified | High |
-| 4 | Default-to-private not in architecture | Medium |
-| 5 | Correlation mitigations missing | Medium |
-| 6 | No failure thresholds defined | Medium |
+**V1 Scope**:
+- M1: Foundation (Todo CRUD, logging, config)
+- M2: Calendar (Google Calendar read + create)
+- M3: DSL Compilation (SymQL, Deno sandbox)
+- M4: Ephemeral Slots (NER, projection, rehydration)
+- M5: Local LLM + Integration (Ollama, end-to-end)
 
 ---
 
@@ -418,15 +412,13 @@ principles-discussion.md (v1.2.0) + derivation-log
          ↓
 PRINCIPLES.md [BINDING] (v1.1.0)
          ↓
-PRD v0.1 + challenges ← CURRENT (awaiting refinement)
+PRD v0.3.0 + TDD v1.0.3 [FINAL]
          ↓
-TDD
-         ↓
-Implementation (Phase 3)
+Implementation (Phase 3) ← NEXT
 ```
 
 When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or context.
 
 ---
 
-*Last updated: 2026-01-18 (evening — TDD challenge phase in progress)*
+*Last updated: 2026-01-19 (TDD complete, ready for implementation)*

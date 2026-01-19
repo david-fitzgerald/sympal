@@ -1,8 +1,8 @@
 # SymPAL Technical Design Document
 
-**Version:** 1.0.2
+**Version:** 1.0.3
 **Date:** 2026-01-19
-**Status:** Draft (Vale + Adversary passed, awaiting Vero)
+**Status:** Final (Vero review passed)
 **Author:** Kael + Ryn (synthesis from Lead Dev interview + delta)
 **PRD Reference:** foundations/prd.md (v0.3.0)
 **Privacy Reference:** foundations/privacy-innovations.md (v3.0.0)
@@ -105,7 +105,7 @@ With PaaP deferred, V1 achieves:
               ▼               ▼               ▼
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐
 │  Integrations   │ │   Capabilities  │ │      Privacy Tier       │
-│  - Calendar(RW) │ │   - Todo CRUD   │ │  ┌─────────────────┐    │
+│  - Calendar*    │ │   - Todo CRUD   │ │  ┌─────────────────┐    │
 │                 │ │   - Day Planner │ │  │ Query Classifier│    │
 │  (Gmail, Cont-  │ │                 │ │  │ (keyword cascade)│   │
 │   acts = V1.5+) │ │                 │ │  └────────┬────────┘    │
@@ -132,6 +132,7 @@ With PaaP deferred, V1 achieves:
 └─────────────────────────────────────────────────────────────────┘
 
 Legend: DSL = DSL Compilation, E.S = Ephemeral Slots, Local = Local LLM
+        * = Read + Create only (see Calendar Write Controls)
 ```
 
 ### Component Summary
@@ -494,6 +495,8 @@ CREATE TABLE calendar_events (
 
 **Gate**: Can view today's calendar and todos together
 
+**OAuth Implementation Note**: Token refresh strategy (background vs. on-demand) to be determined during implementation. Both are well-documented patterns; prefer on-demand for simplicity in V1.
+
 **Calendar Write Controls** (V1):
 - **Supported**: Create events only (no modify, no delete in V1)
 - **Confirmation**: All event creation requires explicit user confirmation before API call
@@ -519,6 +522,8 @@ CREATE TABLE calendar_events (
 - [ ] Projection function (real → placeholders)
 - [ ] Rehydration function (response → real)
 - [ ] Test with reasoning queries
+
+**NER Implementation Note**: Library choice to be determined during implementation. Options: Go-native (prose, go-ner) vs. subprocess to Python (spaCy). Prefer Go-native for single-binary goal unless accuracy gap is significant.
 
 **Gate**: >95% rehydration accuracy
 
@@ -659,6 +664,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.0.3 | 2026-01-19 | Vero review fixes (all MINOR): (1) Fixed diagram — Calendar* with note for R+Create only; (2) Added OAuth implementation note (prefer on-demand refresh); (3) Added NER implementation note (prefer Go-native unless accuracy gap). Status → Final. |
 | 1.0.2 | 2026-01-19 | Adversary challenge fixes: (1) Added UNCERTAIN fallback rate metric (<20%) with circuit breaker; (2) Added rehydration failure categories with "wrong placeholder" mitigation; (3) Fixed correlation claim to include behavioral pattern caveat; (4) Made M5 gate objective (≥50% queries via DSL/Ephemeral Slots); (5) Documented SymQL intentional limitations, added expressiveness test to M3; (6) Specified calendar write controls (create only, confirmation required, no attendees). |
 | 1.0.1 | 2026-01-19 | Vale checkpoint fixes: (1) Added `sympal log` command to M1 for P10 user control; (2) Clarified Cloud LLM decision — V1 hardcodes Claude, abstraction layer is V2 scope (P3 deferred). |
 | 1.0.0 | 2026-01-19 | Fresh synthesis from extraction notes + privacy-innovations v3.0.0 + delta interview. Key changes: Three-tier → DSL/Ephemeral Slots/Local (no PaaP in V1); Semantic Projection → Ephemeral Slots; Added Query Classifier spec; Added cost model; Added failure UX; Added milestone gates; Task-based legend defaults; Skip NER review for known entities. |
