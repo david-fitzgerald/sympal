@@ -1,7 +1,7 @@
 # SymPAL Product Requirements Document
 
-**Version:** 0.2.0
-**Date:** 2026-01-18
+**Version:** 0.3.0
+**Date:** 2026-01-19
 **Status:** Draft (Clarifications integrated, awaiting Checkpoint)
 **Author:** Kael + Orin (synthesis from Lead Dev interview)
 **Source:** foundations/working/prd-extraction-notes.md
@@ -156,7 +156,7 @@ What we are NOT optimizing for in V1:
 
 | # | Feature | Priority | User Story | Feasibility | Notes |
 |---|---------|----------|------------|-------------|-------|
-| 1 | Privacy layer | P0 | Privacy-wrapped integration | High complexity | Core differentiator; three-tier approach defined in privacy-innovations.md |
+| 1 | Privacy layer | P0 | Privacy-wrapped integration | High complexity | Core differentiator; four-tier approach (DSL, PaaP, Ephemeral Slots, Local) defined in privacy-innovations.md |
 | 2 | Gmail integration | P0 | Email-to-todo | Medium complexity | Google API well-documented; OAuth required |
 | 3 | Google Calendar integration | P0 | Calendar-aware planning | Medium complexity | Similar to Gmail; same OAuth scope |
 | 4 | Google Contacts integration | P0 | Contact enrichment | Low complexity | Straightforward API; less data than email/calendar |
@@ -170,7 +170,7 @@ What we are NOT optimizing for in V1:
 
 **Kael's notes on complexity:**
 
-- **Privacy layer (High)**: Three-tier approach (LLM-as-compiler, semantic projection, local LLM) defined in privacy-innovations.md. Implementation complexity remains high but approach is now specified.
+- **Privacy layer (High)**: Four-tier approach (DSL Compilation, Prompt-as-Program, Ephemeral Slots, Local LLM) defined in privacy-innovations.md v2.5.0. Implementation complexity remains high but approach is now specified with detailed failure modes, success criteria, and validation gates.
 - **Google integrations (Medium)**: OAuth is well-trodden path. Main work is handling token refresh, scopes, and error cases. Not technically hard, but fiddly.
 - **CLI (Medium)**: Good CLI UX is harder than it looks. Need to study Claude Code, Gemini CLI for patterns. Risk: scope creep into "nice to have" features.
 
@@ -245,7 +245,7 @@ No premature commitment.
 
 | Adversary | Concern | Design Response |
 |-----------|---------|-----------------|
-| LLM Provider (passive) | Profile building, data monetization over time | Semantic projection — they see patterns, not identities |
+| LLM Provider (passive) | Profile building, data monetization over time | Ephemeral Slots — single-use placeholders defeat entity-level profiling; behavioral patterns remain visible (mitigated) |
 | LLM Provider (active) | Deanonymization via query correlation | Token rotation, batching, timing noise |
 
 **Core assumption**: Big tech has incentives to treat users as data products. They will do this. Design assumes providers are honest-but-curious (follow protocols, but analyze everything they legally can).
@@ -325,9 +325,9 @@ These are explicitly out of scope for V1:
 
 ### Open Questions
 
-1. **Privacy mechanism validation** — Three-tier approach (LLM-as-compiler, semantic projection, local LLM) defined in privacy-innovations.md. TDD must validate feasibility and measure latency impact against 1.5x baseline.
+1. **Privacy mechanism validation** — Four-tier approach (DSL Compilation, Prompt-as-Program, Ephemeral Slots, Local LLM) defined in privacy-innovations.md v2.5.0. TDD must validate feasibility and measure latency impact against 1.5x baseline. Note: PaaP is optional — V1 can ship without it if local LLM quality is insufficient.
 
-   **Vero review note (address in TDD)**: If three-tier approach proves infeasible, define fallback options: (a) transparency-only mode, (b) local-LLM-only for sensitive data, (c) scope reduction to low-sensitivity integrations only.
+   **Vero review note (address in TDD)**: If four-tier approach proves infeasible, define fallback options: (a) DSL + Local only (no cloud reasoning), (b) local-LLM-only for sensitive data, (c) scope reduction to low-sensitivity integrations only.
 
 2. **How to detect actionable emails vs. noise?** What's acceptable false positive/negative rate?
 
@@ -347,7 +347,7 @@ These are explicitly out of scope for V1:
 
 | Constraint | How PRD Addresses |
 |------------|-------------------|
-| P1: Privacy & Data Sovereignty | Core feature: three-tier privacy layer; all data stored locally; user controls what's sent |
+| P1: Privacy & Data Sovereignty | Core feature: four-tier privacy layer (DSL, PaaP, Ephemeral Slots, Local); all data stored locally; user controls what's sent |
 | P2: Open Source | Implicit — project is open source; PRD doesn't contradict |
 | P3: LLM-Agnosticism | Multi-LLM support (P1); Claude, GPT, Gemini in V1 |
 | P4: Honesty | Transparency requirement: user can see what was sent to LLM |
@@ -371,3 +371,4 @@ These are explicitly out of scope for V1:
 |---------|------|---------|
 | 0.1.0 | 2026-01-17 | Initial synthesis from extraction interview |
 | 0.2.0 | 2026-01-18 | Added: Threat Model, Architecture Principles (modular monolith), updated NFRs (latency specs, no fast mode), clarified privacy mechanism status |
+| 0.3.0 | 2026-01-19 | Updated privacy terminology to match privacy-innovations.md v2.5.0: "three-tier" → "four-tier" (DSL, PaaP, Ephemeral Slots, Local); "Semantic projection" → "Ephemeral Slots"; noted PaaP is optional; clarified behavioral profiling is mitigated not invisible |
