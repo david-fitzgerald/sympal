@@ -348,7 +348,7 @@ Full details in `foundations/project-context.md`.
 
 **Phase 1 (Foundations)**: Complete
 **Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.1.0)
-**Phase 2.5 (PRD)**: Complete — prd.md v0.3.0 (Vale + Vero reviewed)
+**Phase 2.5 (PRD)**: Complete — prd.md v1.0.0 (Ratified)
 **Phase 2.6 (TDD)**: Complete — tdd.md v1.0.3 (Vale + Adversary + Vero reviewed)
 **Phase 3 (Implementation)**: Ready to start
 
@@ -361,7 +361,7 @@ Full details in `foundations/project-context.md`.
 | Team design research | team-design-best-practices.md |
 | Team personas creation | 6 personas in sympal-team/ |
 | PRINCIPLES.md derivation | PRINCIPLES.md v1.1.0 (ratified) |
-| PRD extraction + synthesis | prd.md v0.3.0 |
+| PRD extraction + synthesis | prd.md v1.0.0 (Ratified) |
 | Privacy research spike | privacy-research.md v0.1.0 |
 | Novel privacy approaches | privacy-innovations.md v3.0.0 |
 | TDD extraction + synthesis | tdd.md v1.0.3 (Final) |
@@ -370,9 +370,9 @@ Full details in `foundations/project-context.md`.
 
 ## Current Focus: Ready for Implementation
 
-**Design phase complete**. All foundational documents reviewed and finalized:
-- PRD v0.3.0 — What we're building
-- TDD v1.0.3 — How we're building it
+**Design phase complete**. All foundational documents reviewed and ratified:
+- PRD v1.0.0 (Ratified) — What we're building
+- TDD v1.0.3 (Final) — How we're building it
 - privacy-innovations.md v3.0.0 — Privacy architecture details
 
 **Next steps**:
@@ -382,7 +382,7 @@ Full details in `foundations/project-context.md`.
 **Key artifacts**:
 
 In `foundations/`:
-- `prd.md` — Product Requirements Document (v0.3.0)
+- `prd.md` — Product Requirements Document (v1.0.0, Ratified)
 - `tdd.md` — Technical Design Document (v1.0.3, Final)
 - `privacy-research.md` — Research survey (v0.1.0)
 - `privacy-innovations.md` — Privacy architecture (v3.0.0)
@@ -412,7 +412,7 @@ principles-discussion.md (v1.2.0) + derivation-log
          ↓
 PRINCIPLES.md [BINDING] (v1.1.0)
          ↓
-PRD v0.3.0 + TDD v1.0.3 [FINAL]
+PRD v1.0.0 [RATIFIED] + TDD v1.0.3 [FINAL]
          ↓
 Implementation (Phase 3) ← NEXT
 ```

@@ -1,8 +1,8 @@
 # SymPAL Product Requirements Document
 
-**Version:** 0.3.0
+**Version:** 1.0.0
 **Date:** 2026-01-19
-**Status:** Draft (Clarifications integrated, awaiting Checkpoint)
+**Status:** Ratified
 **Author:** Kael + Orin (synthesis from Lead Dev interview)
 **Source:** foundations/working/prd-extraction-notes.md
 
@@ -156,7 +156,7 @@ What we are NOT optimizing for in V1:
 
 | # | Feature | Priority | User Story | Feasibility | Notes |
 |---|---------|----------|------------|-------------|-------|
-| 1 | Privacy layer | P0 | Privacy-wrapped integration | High complexity | Core differentiator; four-tier approach (DSL, PaaP, Ephemeral Slots, Local) defined in privacy-innovations.md |
+| 1 | Privacy layer | P0 | Privacy-wrapped integration | High complexity | Core differentiator; three-tier approach (DSL, Ephemeral Slots, Local) for V1; PaaP deferred to V1.5 |
 | 2 | Gmail integration | P0 | Email-to-todo | Medium complexity | Google API well-documented; OAuth required |
 | 3 | Google Calendar integration | P0 | Calendar-aware planning | Medium complexity | Similar to Gmail; same OAuth scope |
 | 4 | Google Contacts integration | P0 | Contact enrichment | Low complexity | Straightforward API; less data than email/calendar |
@@ -170,7 +170,7 @@ What we are NOT optimizing for in V1:
 
 **Kael's notes on complexity:**
 
-- **Privacy layer (High)**: Four-tier approach (DSL Compilation, Prompt-as-Program, Ephemeral Slots, Local LLM) defined in privacy-innovations.md v2.5.0. Implementation complexity remains high but approach is now specified with detailed failure modes, success criteria, and validation gates.
+- **Privacy layer (High)**: Three-tier approach (DSL Compilation, Ephemeral Slots, Local LLM) for V1; PaaP deferred to V1.5. Architecture specified in privacy-innovations.md v3.0.0 and TDD v1.0.3 with detailed failure modes, success criteria, and validation gates.
 - **Google integrations (Medium)**: OAuth is well-trodden path. Main work is handling token refresh, scopes, and error cases. Not technically hard, but fiddly.
 - **CLI (Medium)**: Good CLI UX is harder than it looks. Need to study Claude Code, Gemini CLI for patterns. Risk: scope creep into "nice to have" features.
 
@@ -323,21 +323,19 @@ These are explicitly out of scope for V1:
 | Privacy mechanism validation | Technical | Defined | Yes — TDD must validate feasibility |
 | LLM abstraction layer design | Technical | Unknown | No — can start with single provider |
 
-### Open Questions
+### Open Questions (Resolved in TDD)
 
-1. **Privacy mechanism validation** — Four-tier approach (DSL Compilation, Prompt-as-Program, Ephemeral Slots, Local LLM) defined in privacy-innovations.md v2.5.0. TDD must validate feasibility and measure latency impact against 1.5x baseline. Note: PaaP is optional — V1 can ship without it if local LLM quality is insufficient.
+1. ~~**Privacy mechanism validation**~~ — **RESOLVED**: TDD v1.0.3 specifies three-tier approach for V1 (DSL, Ephemeral Slots, Local). PaaP deferred to V1.5. Latency target ≤1.5x baseline with circuit breakers.
 
-   **Vero review note (address in TDD)**: If four-tier approach proves infeasible, define fallback options: (a) DSL + Local only (no cloud reasoning), (b) local-LLM-only for sensitive data, (c) scope reduction to low-sensitivity integrations only.
+2. **How to detect actionable emails vs. noise?** — Deferred (Email integration is V1.5+)
 
-2. **How to detect actionable emails vs. noise?** What's acceptable false positive/negative rate?
+3. **What's "good enough" categorization if not full Eisenhower?** — To be determined during M1 implementation.
 
-3. **What's "good enough" categorization if not full Eisenhower?** Need to define simpler fallback.
+4. ~~**How to handle OAuth token refresh gracefully?**~~ — **RESOLVED**: TDD v1.0.3 recommends on-demand refresh for V1 simplicity.
 
-4. **How to handle OAuth token refresh gracefully?** Background refresh vs. on-demand?
+5. **What data format for export?** — JSON (per TDD schema design).
 
-5. **What data format for export?** JSON? SQLite dump? Both?
-
-6. **Query classification accuracy** — How reliably can we route queries to the right privacy tier? Requires implementation to measure.
+6. ~~**Query classification accuracy**~~ — **RESOLVED**: TDD v1.0.3 specifies keyword cascade with >80% accuracy target and circuit breaker at <70%.
 
 ---
 
@@ -347,7 +345,7 @@ These are explicitly out of scope for V1:
 
 | Constraint | How PRD Addresses |
 |------------|-------------------|
-| P1: Privacy & Data Sovereignty | Core feature: four-tier privacy layer (DSL, PaaP, Ephemeral Slots, Local); all data stored locally; user controls what's sent |
+| P1: Privacy & Data Sovereignty | Core feature: three-tier privacy layer (DSL, Ephemeral Slots, Local) for V1; all data stored locally; user controls what's sent |
 | P2: Open Source | Implicit — project is open source; PRD doesn't contradict |
 | P3: LLM-Agnosticism | Multi-LLM support (P1); Claude, GPT, Gemini in V1 |
 | P4: Honesty | Transparency requirement: user can see what was sent to LLM |
@@ -369,6 +367,7 @@ These are explicitly out of scope for V1:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 0.1.0 | 2026-01-17 | Initial synthesis from extraction interview |
-| 0.2.0 | 2026-01-18 | Added: Threat Model, Architecture Principles (modular monolith), updated NFRs (latency specs, no fast mode), clarified privacy mechanism status |
+| 1.0.0 | 2026-01-19 | **Ratified**. Aligned with TDD v1.0.3: "four-tier" → "three-tier" for V1 (PaaP deferred to V1.5); updated references to privacy-innovations.md v3.0.0; marked resolved Open Questions. |
 | 0.3.0 | 2026-01-19 | Updated privacy terminology to match privacy-innovations.md v2.5.0: "three-tier" → "four-tier" (DSL, PaaP, Ephemeral Slots, Local); "Semantic projection" → "Ephemeral Slots"; noted PaaP is optional; clarified behavioral profiling is mitigated not invisible |
+| 0.2.0 | 2026-01-18 | Added: Threat Model, Architecture Principles (modular monolith), updated NFRs (latency specs, no fast mode), clarified privacy mechanism status |
+| 0.1.0 | 2026-01-17 | Initial synthesis from extraction interview |

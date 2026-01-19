@@ -18,15 +18,24 @@ The relationship is symbiotic: mutual benefit, mutual accountability, genuine pa
 
 ## Status
 
-**Foundations complete.** Philosophical grounding established, principles ratified, ready for implementation.
+**Design complete. Ready for implementation.**
 
 | Phase | Status |
 |-------|--------|
 | Philosophical foundations | Complete (v1.0.0) |
-| Project context | Complete (v1.1.0) |
-| Team personas | Complete (6 personas) |
-| PRINCIPLES.md | Ratified (v1.0.0) |
-| Implementation | Next |
+| Principles | Ratified (v1.1.0) |
+| PRD | Ratified (v1.0.0) |
+| TDD | Final (v1.0.3) |
+| Implementation | **Next** |
+
+### V1 Scope
+
+Privacy-preserving calendar + todo with three-tier architecture:
+- **M1**: Foundation (Go CLI, SQLite, Todo CRUD)
+- **M2**: Calendar (Google Calendar read + create)
+- **M3**: DSL Compilation (SymQL, Deno sandbox)
+- **M4**: Ephemeral Slots (NER, projection, rehydration)
+- **M5**: Local LLM + Integration (Ollama, end-to-end)
 
 ## What's Here
 
@@ -35,11 +44,13 @@ PRINCIPLES.md             # Binding principles (17 principles, 12 tensions)
 CONTEXT.md                # Project context for LLM sessions
 
 foundations/              # Why we built it this way
+├── prd.md                         (v1.0.0, ratified)
+├── tdd.md                         (v1.0.3, final)
+├── privacy-innovations.md         (v3.0.0, novel approaches)
 ├── philosophical-foundations.md   (v1.0.0, peer-reviewed)
 ├── project-context.md             (v1.1.0, dev context)
 ├── principles-discussion.md       (derivation output)
-├── principles-derivation-log.md   (full audit trail)
-└── reviews/
+└── reviews/                       (Vale, Adversary, Vero reviews)
 
 prompts/                  # Persona architecture
 ├── solas-venn/           # Meta-persona for creating personas
@@ -48,7 +59,7 @@ prompts/                  # Persona architecture
 │   └── sympal-team/      # Vale, Kael, Ryn, Seren, Orin, Adversary
 └── research/
 
-docs/                     # How to use/build (coming)
+src/                      # Implementation (coming)
 ```
 
 ## Hard Constraints
