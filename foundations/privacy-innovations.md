@@ -1,6 +1,6 @@
 # Privacy Innovations — Novel Approaches for SymPAL
 
-**Version**: 2.5.0
+**Version**: 3.0.0
 **Date**: 2026-01-19
 **Status**: Architecture finalized, awaiting implementation
 **Context**: These are novel approaches developed during PRD challenge phase, distinct from existing research. See `privacy-research.md` for survey of existing techniques.
@@ -747,30 +747,48 @@ Query: Find calendar events in date range where attendees
 have no email activity in past N days
 ```
 
-**LLM returns**:
-```python
-def find_neglected_meeting_contacts(calendar, emails, date_range, inactive_days):
-    # Filter calendar events in range
-    upcoming = [e for e in calendar if e.start in date_range]
+**LLM returns** (TypeScript for Deno sandbox):
+```typescript
+// Deno sandbox: no network, no filesystem, data passed via stdin
+interface CalendarEvent { start: Date; attendees: string[]; }
+interface Email { from: string; to: string[]; date: Date; }
 
-    # Get attendee emails
-    attendees = flatten([e.attendees for e in upcoming])
+function findNeglectedMeetingContacts(
+  calendar: CalendarEvent[],
+  emails: Email[],
+  dateRange: { start: Date; end: Date },
+  inactiveDays: number
+): CalendarEvent[] {
+  // Filter calendar events in range
+  const upcoming = calendar.filter(e =>
+    e.start >= dateRange.start && e.start <= dateRange.end
+  );
 
-    # Find last email date per contact
-    last_contact = {}
-    for email in emails:
-        for addr in [email.from] + email.to:
-            if addr not in last_contact or email.date > last_contact[addr]:
-                last_contact[addr] = email.date
+  // Get all attendee emails
+  const attendees = upcoming.flatMap(e => e.attendees);
 
-    # Filter to inactive
-    cutoff = today() - days(inactive_days)
-    neglected = [a for a in attendees if last_contact.get(a, MIN_DATE) < cutoff]
+  // Find last email date per contact
+  const lastContact = new Map<string, Date>();
+  for (const email of emails) {
+    for (const addr of [email.from, ...email.to]) {
+      const prev = lastContact.get(addr);
+      if (!prev || email.date > prev) {
+        lastContact.set(addr, email.date);
+      }
+    }
+  }
 
-    return [e for e in upcoming if any(a in neglected for a in e.attendees)]
+  // Filter to inactive
+  const cutoff = new Date(Date.now() - inactiveDays * 24 * 60 * 60 * 1000);
+  const neglected = new Set(
+    attendees.filter(a => (lastContact.get(a) ?? new Date(0)) < cutoff)
+  );
+
+  return upcoming.filter(e => e.attendees.some(a => neglected.has(a)));
+}
 ```
 
-**User runs locally** with real data. LLM never saw calendar or emails.
+**User runs locally** with real data via Deno subprocess. LLM never saw calendar or emails.
 
 #### Hybrid Compilation: Decomposing Semi-Structured Queries (V1)
 
@@ -829,6 +847,108 @@ Step 2: Local LLM
 - Latency: two-step adds ~2-3s; acceptable given privacy gain
 
 **V1 scope**: Start with explicit patterns (emails about X, meetings with Y). Expand detection as confidence grows.
+
+#### Hybrid Compilation State Machine
+
+Formal definition of the hybrid pipeline as a state machine.
+
+```
+                    ┌─────────────────────────────────────────┐
+                    │              START                       │
+                    │  Input: user_query, data_context         │
+                    └─────────────────────────────────────────┘
+                                       │
+                                       ▼
+                    ┌─────────────────────────────────────────┐
+                    │           CLASSIFY_HYBRID               │
+                    │  Is query decomposable?                  │
+                    │  Check: filter_pattern + content_pattern │
+                    └─────────────────────────────────────────┘
+                           │                    │
+                    [YES: decomposable]    [NO: route normally]
+                           │                    │
+                           ▼                    └──────► EXIT to normal routing
+                    ┌─────────────────────────────────────────┐
+                    │          COMPILE_FILTER                  │
+                    │  Send filter description to cloud LLM    │
+                    │  Receive: DSL/code for filter operation  │
+                    └─────────────────────────────────────────┘
+                           │                    │
+                    [compile success]     [compile fail]
+                           │                    │
+                           ▼                    └──────► FALLBACK_FULL_ROUTE
+                    ┌─────────────────────────────────────────┐
+                    │          EXECUTE_FILTER                  │
+                    │  Run compiled code in sandbox            │
+                    │  Result: filtered_data subset            │
+                    └─────────────────────────────────────────┘
+                           │                    │
+                    [execution success]   [execution fail]
+                           │                    │
+                           ▼                    └──────► FALLBACK_FULL_ROUTE
+                    ┌─────────────────────────────────────────┐
+                    │          CHECK_FILTER_RESULT             │
+                    │  Is filtered_data non-empty?             │
+                    │  Is reduction meaningful? (< 50% of full)│
+                    └─────────────────────────────────────────┘
+                           │                    │
+                    [meaningful reduction] [no benefit]
+                           │                    │
+                           ▼                    └──────► FALLBACK_FULL_ROUTE
+                    ┌─────────────────────────────────────────┐
+                    │        ROUTE_CONTENT_OPERATION           │
+                    │  Classify content operation type:        │
+                    │  SUMMARIZE → Local LLM                   │
+                    │  DRAFT → Local LLM or Ephemeral Slots    │
+                    │  REASON → Ephemeral Slots                │
+                    └─────────────────────────────────────────┘
+                           │
+                           ▼
+                    ┌─────────────────────────────────────────┐
+                    │        EXECUTE_CONTENT                   │
+                    │  Run content operation on filtered_data  │
+                    │  Only filtered subset exposed            │
+                    └─────────────────────────────────────────┘
+                           │
+                           ▼
+                    ┌─────────────────────────────────────────┐
+                    │              END                         │
+                    │  Output: result to user                  │
+                    └─────────────────────────────────────────┘
+
+
+FALLBACK_FULL_ROUTE:
+  ┌─────────────────────────────────────────┐
+  │  Hybrid compilation failed or no benefit │
+  │  Route full query to standard tier:      │
+  │  - Local LLM (content tasks)             │
+  │  - Ephemeral Slots (reasoning tasks)     │
+  │  Log: "hybrid_fallback" for analysis     │
+  └─────────────────────────────────────────┘
+```
+
+**State Transitions:**
+
+| From State | Condition | To State |
+|------------|-----------|----------|
+| START | Query received | CLASSIFY_HYBRID |
+| CLASSIFY_HYBRID | Has filter + content pattern | COMPILE_FILTER |
+| CLASSIFY_HYBRID | No decomposition possible | EXIT (normal routing) |
+| COMPILE_FILTER | DSL generated successfully | EXECUTE_FILTER |
+| COMPILE_FILTER | Compilation failed | FALLBACK_FULL_ROUTE |
+| EXECUTE_FILTER | Code executed, results returned | CHECK_FILTER_RESULT |
+| EXECUTE_FILTER | Execution error | FALLBACK_FULL_ROUTE |
+| CHECK_FILTER_RESULT | Filtered < 50% of original | ROUTE_CONTENT_OPERATION |
+| CHECK_FILTER_RESULT | No meaningful reduction | FALLBACK_FULL_ROUTE |
+| ROUTE_CONTENT_OPERATION | Content type classified | EXECUTE_CONTENT |
+| EXECUTE_CONTENT | Complete | END |
+| FALLBACK_FULL_ROUTE | Always | Standard routing path |
+
+**Key invariants:**
+1. Filter step NEVER sees content — only structural description
+2. Content step only sees filtered subset
+3. Any failure falls back to standard (safe) routing
+4. "Meaningful reduction" threshold (50%) prevents wasteful decomposition
 
 #### Failure Modes & Limitations (DSL)
 
@@ -1113,6 +1233,104 @@ Cloud generates prompt pipeline:
 Local runs pipeline sequentially, each prompt zero-exposure.
 ```
 
+#### PaaP Schema v1.0
+
+The formal JSON structure for Prompt-as-Program outputs from the cloud LLM.
+
+**Single-step program:**
+```json
+{
+  "version": "1.0",
+  "type": "single",
+  "task": "email_triage",
+  "prompt": {
+    "template": "Classify this email: {{INPUT}}\n\nOutput: URGENT|RESPONSE|INFO|IGNORE",
+    "input_var": "INPUT",
+    "output_format": "enum",
+    "output_values": ["URGENT", "RESPONSE", "INFO", "IGNORE"]
+  },
+  "validation": {
+    "output_must_match": "^(URGENT|RESPONSE|INFO|IGNORE)$",
+    "retry_on_fail": true,
+    "max_retries": 2
+  }
+}
+```
+
+**Multi-step pipeline:**
+```json
+{
+  "version": "1.0",
+  "type": "pipeline",
+  "task": "extract_decisions",
+  "steps": [
+    {
+      "id": "segment",
+      "prompt": {
+        "template": "Split this text into logical sections:\n{{INPUT}}\n\nOutput JSON array of sections.",
+        "input_var": "INPUT",
+        "output_format": "json_array"
+      },
+      "output_var": "SECTIONS"
+    },
+    {
+      "id": "detect",
+      "for_each": "SECTIONS",
+      "prompt": {
+        "template": "Does this section contain a decision? Answer YES or NO.\n\n{{SECTION}}",
+        "input_var": "SECTION",
+        "output_format": "enum",
+        "output_values": ["YES", "NO"]
+      },
+      "filter": "YES",
+      "output_var": "DECISION_SECTIONS"
+    },
+    {
+      "id": "extract",
+      "for_each": "DECISION_SECTIONS",
+      "prompt": {
+        "template": "Extract the decision from this text:\n{{SECTION}}\n\nFormat: {decision, owner, date}",
+        "input_var": "SECTION",
+        "output_format": "json_object"
+      },
+      "output_var": "DECISIONS"
+    }
+  ],
+  "final_output": "DECISIONS"
+}
+```
+
+**Schema fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `version` | string | Yes | Schema version (currently "1.0") |
+| `type` | enum | Yes | "single" or "pipeline" |
+| `task` | string | Yes | Human-readable task identifier |
+| `prompt` / `steps` | object/array | Yes | Single prompt or array of steps |
+| `prompt.template` | string | Yes | Prompt text with `{{VAR}}` placeholders |
+| `prompt.input_var` | string | Yes | Variable name for input data |
+| `prompt.output_format` | enum | Yes | "text", "enum", "json_object", "json_array" |
+| `prompt.output_values` | array | If enum | Valid output values for enum format |
+| `validation.output_must_match` | regex | No | Regex to validate output |
+| `validation.retry_on_fail` | bool | No | Retry with stricter prompt on validation fail |
+| `steps[].id` | string | Yes | Unique step identifier |
+| `steps[].for_each` | string | No | Variable to iterate over |
+| `steps[].filter` | string | No | Keep only items matching this value |
+| `steps[].output_var` | string | Yes | Variable name for step output |
+| `final_output` | string | If pipeline | Variable containing final result |
+
+**Variable passing:**
+- Variables are scoped to the pipeline execution
+- `{{VAR}}` in templates replaced with variable values
+- `for_each` iterates and binds each item to the specified `input_var`
+- `filter` removes items that don't match the specified output value
+
+**Validation:**
+- `output_format: enum` requires output to be one of `output_values`
+- `output_must_match` regex validated before accepting output
+- Failed validation triggers retry with appended "Output MUST be exactly: [values]"
+
 #### Failure Modes & Limitations (PaaP)
 
 | Failure Mode | Severity | Mitigation | Residual Risk |
@@ -1169,6 +1387,37 @@ With both compilation paths, zero-exposure extends to many queries:
 **V1 target**: 60-70% of queries via zero-exposure paths (DSL + PaaP + Local). If PaaP is cut, target drops to 50-70% (DSL + Local only); fuzzy tasks route to Ephemeral Slots instead.
 
 **Gate**: Measure actual query distribution in dogfooding. Adjust estimates before M5. PaaP gate: 70% task success on summarization/classification benchmarks.
+
+### Cost of Privacy Model
+
+Privacy has costs: latency, quality, and API spend. This table makes the tradeoffs explicit.
+
+**Estimated costs per query (V1):**
+
+| Path | Latency | API Calls | API Cost* | Quality | Privacy |
+|------|---------|-----------|-----------|---------|---------|
+| **Heuristic/Template** | ~50ms | 0 | $0 | Low (rigid) | Zero exposure |
+| **DSL Compilation** | 1-2s | 1 cloud | ~$0.002 | High (logic) | Zero exposure |
+| **PaaP Compilation** | 2-4s | 1 cloud + local | ~$0.002 | Medium | Zero exposure |
+| **Ephemeral Slots** | 1-3s | 1 cloud | ~$0.003 | High | Protected |
+| **Local LLM only** | 2-5s | 0 | $0 | Medium-Low | Zero exposure |
+| **Hybrid (DSL→Slots)** | 2-4s | 2 cloud | ~$0.005 | High | Zero→Protected |
+| **Interactive Scaffolding** | 4-10s | 2-4 cloud | ~$0.008 | High | Zero→Protected |
+
+*Cost estimates assume Claude Sonnet pricing (~$3/1M input, $15/1M output tokens) for typical query sizes.
+
+**Key insights:**
+- **Heuristics are free** — invest in expanding template coverage
+- **DSL is cheap and fast** — maximize structured query coverage
+- **Local LLM trades quality for zero cost** — acceptable for drafts
+- **Ephemeral Slots is the quality ceiling** — use when reasoning genuinely needed
+- **Interactive Scaffolding is expensive but surgical** — pays off for complex queries that would otherwise need massive legends
+
+**Cost optimization strategy:**
+1. Route as much as possible to DSL/Heuristics (fast, cheap, zero exposure)
+2. Use PaaP for fuzzy data tasks if local quality is acceptable
+3. Reserve Ephemeral Slots for genuine reasoning needs
+4. Use Interactive Scaffolding only for complex multi-part queries
 
 ---
 
@@ -1318,6 +1567,8 @@ If any criterion fails, re-evaluate whether V1.5 is ready to ship.
 
 ## Novel Approach 3: P2P Query Mixing (V2+)
 
+> **V2+ scope**: This section documents a future enhancement requiring multiple users. Not applicable for V1 dogfooding and can be skipped if focusing on V1 implementation.
+
 ### The Idea
 
 Multiple users' queries get pooled and shuffled before hitting the LLM. The LLM sees queries but can't attribute them to individuals.
@@ -1433,11 +1684,202 @@ Go interp   Local LLM    locally            response
 
 This ensures the system fails-safe toward privacy, not toward capability.
 
+### Query Classifier Specification (V1)
+
+The classifier is the entry point for all queries. It determines which privacy path handles the request. **This is the most critical component** — misclassification can expose data unnecessarily or degrade quality.
+
+#### V1 Implementation: Keyword Cascade
+
+V1 uses a simple, deterministic keyword-based classifier. No ML, no cloud calls — purely local pattern matching.
+
+```
+CLASSIFY(query):
+
+    1. CHECK STRUCTURED PATTERNS (→ DSL Compilation)
+       Keywords: "how many", "count", "list", "filter", "search",
+                 "find all", "show me", "when is", "what time"
+       Patterns: Questions about quantity, filtering, scheduling
+       Confidence: HIGH if keyword match + no content verbs
+
+    2. CHECK FUZZY-DATA PATTERNS (→ PaaP Compilation)
+       Keywords: "summarize", "extract", "classify", "categorize",
+                 "sort by importance", "triage", "label"
+       Patterns: Data processing without generation
+       Confidence: HIGH if keyword match + data reference
+       Gate: Only if PaaP enabled (local LLM quality passed benchmark)
+
+    3. CHECK HYBRID PATTERNS (→ DSL then Ephemeral Slots)
+       Patterns: Structured query + content operation
+       Examples: "Summarize my meetings with [filter]"
+                 "What's most urgent in [date range]?"
+       Detection: Structured keyword + content verb
+       Confidence: MEDIUM (requires both patterns)
+
+    4. CHECK REASONING PATTERNS (→ Ephemeral Slots)
+       Keywords: "should I", "prioritize", "advise", "recommend",
+                 "what do you think", "help me decide", "plan"
+       Patterns: Requests requiring judgment, planning, advice
+       Confidence: HIGH if keyword match
+
+    5. CHECK CONTENT PATTERNS (→ Local LLM)
+       Keywords: "draft", "write", "compose", "rewrite", "edit",
+                 "rephrase", "translate"
+       Patterns: Pure generation with user-provided content
+       Confidence: HIGH if keyword match + quoted/referenced content
+
+    6. DEFAULT (→ Local LLM with quality warning)
+       If no pattern matches with HIGH confidence
+       User sees: "Processing locally for privacy. Quality may vary."
+       User can override: "Use cloud processing" → Ephemeral Slots
+```
+
+#### Classification Categories
+
+| Category | Trigger Patterns | Privacy Path | Exposure Level |
+|----------|------------------|--------------|----------------|
+| STRUCTURED | Quantity, filter, schedule queries | DSL Compilation | Zero |
+| FUZZY_DATA | Summarize, extract, classify (no generation) | PaaP Compilation | Zero |
+| HYBRID | Filter + content operation | DSL → Ephemeral Slots | Zero → Protected |
+| REASONING | Judgment, planning, advice | Ephemeral Slots | Protected |
+| CONTENT | Draft, write, compose | Local LLM | Zero |
+| UNCERTAIN | No confident match | Local LLM (default) | Zero |
+
+#### Confidence Thresholds
+
+| Confidence | Definition | Action |
+|------------|------------|--------|
+| HIGH | Strong keyword match, unambiguous intent | Route to matched path |
+| MEDIUM | Partial match or mixed signals | Route with caution; log for review |
+| LOW | Weak match, ambiguous | Default to Local LLM |
+| NONE | No patterns match | Default to Local LLM with warning |
+
+**Threshold behavior**: Routes to higher-exposure paths (Ephemeral Slots, PaaP) only on HIGH confidence. MEDIUM or below defaults toward privacy.
+
+#### Order of Operations (Why This Order?)
+
+1. **Structured first**: Zero exposure is best; check if query can be fully handled by DSL
+2. **Fuzzy-data second**: Also zero exposure; check if PaaP can handle it
+3. **Hybrid third**: Maximize zero-exposure portion before falling back
+4. **Reasoning fourth**: Protected exposure only when reasoning genuinely needed
+5. **Content fifth**: Local LLM for generation (zero exposure, may have quality tradeoff)
+6. **Default last**: Always have a safe fallback
+
+#### Examples
+
+| Query | Classification | Reasoning |
+|-------|----------------|-----------|
+| "How many meetings do I have next week?" | STRUCTURED | "How many" + time filter → DSL |
+| "Summarize my unread emails" | FUZZY_DATA | "Summarize" + data reference → PaaP |
+| "What's the most urgent email from this week?" | HYBRID | Filter (this week) + judgment (urgent) |
+| "Should I accept this meeting invitation?" | REASONING | "Should I" → needs judgment |
+| "Draft a reply declining politely" | CONTENT | "Draft" + generation → Local LLM |
+| "What's the deal with Project Phoenix?" | UNCERTAIN | Ambiguous intent → Local LLM default |
+
+#### Failure Modes
+
+| Failure | Consequence | Mitigation |
+|---------|-------------|------------|
+| False positive for STRUCTURED | DSL compilation fails | Fallback cascade to Ephemeral Slots |
+| False positive for FUZZY_DATA | PaaP produces poor quality | User sees quality warning; can retry with Ephemeral Slots |
+| False negative (under-classification) | Query goes to Local LLM unnecessarily | User can override; quality acceptable for most cases |
+| False positive for higher exposure | Data sent when it could have been local | Logging + weekly audit to tune patterns |
+
+**Design principle**: False negatives (routing to Local LLM when unnecessary) are acceptable. False positives (routing to higher exposure when unnecessary) should be minimized.
+
+#### V1.5: Confidence Scoring
+
+V1.5 may add lightweight confidence scoring:
+- Multiple keyword matches increase confidence
+- Conflicting patterns decrease confidence
+- Query length and complexity as signals
+- User feedback loop to tune thresholds
+
+For V1, the simple keyword cascade is sufficient. Complexity can be added based on dogfooding data.
+
 ---
 
 ## UX-Centric Privacy Controls
 
 Technical privacy means nothing if users can't understand or control it. These UX patterns make privacy tangible.
+
+### User-Facing Failure Model (V1)
+
+Trust is built on transparently handling failure. When something goes wrong, the user should understand what happened and what options they have.
+
+**Philosophy**: Fail visibly, fail safely, offer alternatives.
+
+#### Failure Types and User Experience
+
+| Failure | What User Sees | Options Offered |
+|---------|----------------|-----------------|
+| **DSL compilation fails** | "Couldn't convert this to a structured query." | "Try with AI reasoning instead?" (→ Ephemeral Slots) |
+| **PaaP quality too low** | "Local processing produced uncertain results." | "Review and accept?" / "Retry with cloud?" (→ Ephemeral Slots) |
+| **NER misses entity** | "Found these entities: [list]. Add any I missed?" | Edit entity list before sending |
+| **Rehydration fails** | "Couldn't fill in all the names. Raw response:" | Show partial result with unfilled slots visible |
+| **Local LLM unavailable** | "Local AI not running. Some features limited." | "Start Ollama?" / "Use cloud with privacy protection?" |
+| **Cloud API error** | "Couldn't reach AI service." | "Retry?" / "Try local-only?" |
+| **Classification uncertain** | "Not sure how to handle this privately." | "Process locally (may be lower quality)?" / "Use cloud with privacy protection?" |
+
+#### Design Principles
+
+1. **Never silently degrade**: If privacy or quality is worse than expected, say so
+2. **Always offer alternatives**: Every failure has a fallback path
+3. **Explain in plain language**: No technical jargon in user-facing messages
+4. **Default to privacy**: When in doubt, offer the more private option first
+5. **Make repair easy**: If user catches an error (e.g., missed entity), one-click fix
+
+#### Example Failure Flows
+
+**DSL Compilation Failure:**
+```
+User: "What's the vibe of my meetings this week?"
+
+System: "I can't convert this to a structured query.
+        This question needs AI reasoning.
+
+        Option 1: Use cloud AI with privacy protection
+                  (names hidden, relationships shown)
+        Option 2: Process locally (slower, may be less accurate)
+
+        [Cloud with protection] [Local only] [Cancel]"
+```
+
+**NER Miss (Critical):**
+```
+User: "Draft an email to JohnBoy about the Phoenix thing"
+
+System: "I found these entities to protect:
+        • JohnBoy → will become {{PERSON_kestrel}}
+        • Phoenix → will become {{PROJECT_sparrow}}
+
+        Did I miss anything? (nicknames, code names?)
+
+        [Looks good] [Add more] [Show what will be sent]"
+```
+
+**Rehydration Failure:**
+```
+System: "The AI response couldn't be fully processed.
+        Some placeholders weren't filled in:
+
+        'Dear {{PERSON_kestrel}}, regarding {{PROJECT_sparrow}}...'
+
+        [Edit manually] [Retry] [Show full response]"
+```
+
+#### Error Logging
+
+All failures logged locally with:
+- Timestamp
+- Failure type
+- Query (sanitized)
+- Path attempted
+- Fallback taken
+- User choice
+
+This supports both debugging and transparency (user can audit their failure history).
+
+---
 
 ### V1: Progressive Consent Ladder (A)
 
@@ -2186,6 +2628,8 @@ Justification-driven serialization. Every field must have a "need proof" to leav
 
 ### V2+
 
+> **Note for V1 implementation**: The sections below document future enhancements and are provided for architectural context only. They are **not in scope for V1** and can be skipped if focusing on current implementation. Consider these a roadmap for post-V1 evolution.
+
 #### The Foundry: Reusable Personal API
 
 Instead of generating one-off scripts, the LLM incrementally builds a stable, versioned, local API for the user's data.
@@ -2655,6 +3099,72 @@ For each entity category, use minimal context templates:
 
 **Legend minimization principle**: Include only what the task requires. For "draft professional email", you need relationship context. For "count meetings", you may need nothing beyond "is a meeting."
 
+### Legend Construction Rules
+
+Formal mapping of (Entity Type × Task Type) → Legend Template. These rules guide the automatic legend generator.
+
+#### Task Types
+
+| Task Type | Classifier Keywords | Context Needed |
+|-----------|---------------------|----------------|
+| SCHEDULING | "schedule", "conflict", "when", "available" | Time relationships only |
+| COUNTING | "how many", "count", "number of" | Existence only |
+| DRAFTING | "draft", "write", "email", "message" | Relationship + tone |
+| REASONING | "should I", "prioritize", "advise" | Full relationship context |
+| SUMMARIZING | "summarize", "overview", "recap" | Role/type only |
+
+#### Legend Template Matrix
+
+| Entity Type | SCHEDULING | COUNTING | DRAFTING | REASONING | SUMMARIZING |
+|-------------|------------|----------|----------|-----------|-------------|
+| **PERSON** | "is a contact" | "is someone" | "is my [relationship], [tone hint]" | "is my [relationship], [context]" | "is a [role]" |
+| **ORGANIZATION** | "is an org" | "is an org" | "is a [type] we work with" | "is a [type], [relationship]" | "is a [type]" |
+| **PROJECT** | "is a project" | "is a project" | "is a [priority] project" | "is a [priority] [type] project, [status]" | "is a [type] project" |
+| **EVENT** | "is an event at [time bucket]" | "is an event" | "is a [type] meeting" | "is a [type] meeting with [attendee roles]" | "is a [type] event" |
+| **LOCATION** | "is a location" | "is a location" | "is a [type] location" | "is [our office / client site / etc.]" | "is a location" |
+
+**Reading the matrix:**
+- Columns = task types (detected by classifier)
+- Rows = entity types (detected by NER)
+- Cells = legend template to use
+- `[bracketed]` = fill from entity metadata or escalate
+
+#### Escalation Rules
+
+When to move from minimal to detailed:
+
+```
+1. START with column template (task-appropriate minimum)
+
+2. ESCALATE if:
+   - LLM response is generic/unhelpful (quality < threshold)
+   - Task explicitly requires context (e.g., "relationship advice")
+   - User requests more detail
+
+3. ESCALATION PATH:
+   COUNTING → SCHEDULING → SUMMARIZING → DRAFTING → REASONING
+   (Each step adds context; REASONING is maximum detail)
+
+4. NEVER:
+   - Include proper names in legend (that's what slots hide)
+   - Include unique identifying details ("the one with the red hair")
+   - Jump straight to REASONING level without trying simpler first
+```
+
+#### Example: Same Entity, Different Tasks
+
+Entity: Jane Smith (manager, strained relationship)
+
+| Task | Legend Generated |
+|------|------------------|
+| "How many meetings with Jane?" | "{{PERSON_kestrel}} is someone" |
+| "When is my next meeting with Jane?" | "{{PERSON_kestrel}} is a contact" |
+| "Summarize my interactions with Jane" | "{{PERSON_kestrel}} is my manager" |
+| "Draft an email to Jane about the deadline" | "{{PERSON_kestrel}} is my manager, formal tone preferred" |
+| "Should I escalate the issue to Jane?" | "{{PERSON_kestrel}} is my direct manager, relationship is strained, she prefers directness" |
+
+**Key insight**: The same entity gets vastly different legends depending on what the task needs. This is the core of minimization — context is task-scoped, not entity-scoped.
+
 ### V1 Hardening Measures
 
 **1. Temporal Jittering**
@@ -2731,6 +3241,76 @@ Log legends locally for user review:
 2. **NER accuracy on personal data**: How well do off-the-shelf NER models work on personal communications (nicknames, code names, implicit refs)? User correction flow is mandatory, but how much friction?
 
 3. **Provider trust verification**: How do we verify providers aren't doing undisclosed analysis? May require cryptographic approaches (V2+).
+
+### Explicitly Accepted Project Risks
+
+These are the highest-severity risks that **cannot be fully mitigated** in V1. They are accepted with clear eyes.
+
+#### Risk 1: NER is the Achilles' Heel of Ephemeral Slots (CRITICAL)
+
+**The risk**: A single missed entity — a nickname, project codename, or typo — bypasses the entire Ephemeral Slots mechanism and leaks the raw identifier in an otherwise-secure prompt.
+
+**Why it's severe**: This is the most likely vector for an accidental, high-severity data leak in V1. User diligence at "review on first mention" cannot catch entities introduced later in conversation.
+
+**Acceptance rationale**:
+- Perfect NER is impossible on personal data (nicknames, code names, implicit references)
+- User review provides a defense layer, even if imperfect
+- The alternative (require review for every query) destroys UX
+- Leaking occasional entity names is less severe than leaking entire context
+
+**Mitigations in place**:
+- "Review on first mention" for new entities
+- User can add custom entities to watch list
+- Logging shows what was sent for post-hoc audit
+- For email (M5+), require per-query entity review given higher stakes
+
+**Residual exposure**: A motivated user reviewing their logs may discover occasional entity leaks. This is acceptable for dogfooding. For broader deployment, NER accuracy must improve or stricter review gates are needed.
+
+---
+
+#### Risk 2: PaaP Depends on Local Model Quality (EXTERNAL DEPENDENCY)
+
+**The risk**: The zero-exposure promise for fuzzy tasks via PaaP is contingent on local LLM quality. If Llama/Mistral/Phi-3 cannot reliably follow cloud-generated prompts, the entire path becomes a dead end.
+
+**Why it's severe**: This is an external dependency we cannot control. Local model quality is improving rapidly, but may stagnate or prove insufficient for specific tasks.
+
+**Acceptance rationale**:
+- PaaP is explicitly **optional** — V1 can ship without it
+- If PaaP fails benchmarks, fuzzy tasks route to Ephemeral Slots (protected, not zero-exposure)
+- This bet is on the broader AI industry trajectory, which favors us
+- Even partial PaaP success expands zero-exposure coverage
+
+**Mitigations in place**:
+- 70% task success benchmark gate before enabling PaaP
+- Fallback cascade: PaaP failure → Ephemeral Slots
+- User-visible quality warnings when PaaP produces uncertain results
+- Logging compares PaaP vs Ephemeral Slots quality for same tasks
+
+**Residual exposure**: If local models disappoint, V1 coverage estimate drops from 60-70% zero-exposure to 50-60%. Privacy guarantee shifts more toward "protected" than "zero." This is acceptable.
+
+---
+
+#### Risk 3: Legend Leakage if Escalation Always Required (QUALITY DEPENDENCY)
+
+**The risk**: The minimization framework assumes minimal legends are often sufficient. If dogfooding reveals that acceptable quality always requires detailed legends (e.g., "is my manager with a strained relationship"), then the privacy benefit of Ephemeral Slots is reduced to merely hiding the name.
+
+**Why it's severe**: This undermines a core claim — that Ephemeral Slots protects not just names but relationship context. If detailed legends are always needed, we're back to "hiding names only."
+
+**Acceptance rationale**:
+- We don't know until we try — this is empirical
+- Even "names only" protection defeats the most valuable profiling (identity correlation)
+- Dogfooding will reveal the truth before broader deployment
+- We can adjust legend templates based on findings
+
+**Mitigations in place**:
+- Conservative defaults (start minimal, escalate only on quality failure)
+- Legend audit logging shows what context was actually needed
+- Weekly review of escalation frequency during dogfooding
+- Template library can be tuned based on real data
+
+**Residual exposure**: Worst case, Ephemeral Slots provides strong name protection but weaker relationship protection. This is still better than raw data exposure and competitive with any existing approach.
+
+---
 
 ### Mitigated Risks (Active Defenses in V1)
 
@@ -2835,6 +3415,7 @@ These innovations are the response to:
 | 2.3.0 | 2026-01-19 | **Further hardening**: (1) Legend now explicitly "minimum viable" — escalate only if quality degrades. (2) Entity-level profiling via unique descriptions called out as remaining risk. (3) Rehydration fallback cascade defined (retry → local → partial with warning). (4) NER review friction addressed with "review first mention only" default. (5) Legend minimization elevated to M3 gating criterion. (6) PaaP explicitly optional — skip if local LLM quality < threshold. (7) Behavioral profiling mitigations expanded (template normalization, length caps). (8) Entity-level correlation reclassified as "partially resolved". (9) Updated correlation mitigations to reference Ephemeral Slots, not projection. |
 | 2.4.0 | 2026-01-19 | Added **Interactive Scaffolding (V1.5)**: Meta-innovation for complex/uncertain queries. Instead of routing to single massive Ephemeral Slots prompt, system engages cloud LLM in abstract planning dialogue (zero content) to build custom execution plan composing DSL + PaaP + Ephemeral Slots. Makes "uncertain" the smartest path, not a fallback. Includes two-phase process (planning dialogue → execution program), privacy model, concerns/mitigations, success criteria. Updated architecture diagram. |
 | 2.5.0 | 2026-01-19 | **Consistency review**: (1) Reframed "Why It Replaces Semantic Projection" as design history. (2) Removed 80%+ claim from v2.0.0 version entry. (3) Added detail escalation decision framework with thresholds. (4) Reconciled NER confidence with M5 gate via per-tier requirements. (5) Clarified PaaP optional status in coverage table. (6) Reframed behavioral profiling as "mitigated risk" not "accepted limitation". (7) Added "Privacy by Default" routing principle. (8) Made Deno sandbox permissions explicit. (9) Added Interactive Scaffolding success criteria table. (10) Added failure thresholds to quality measurement. (11) Fixed outdated "projection" reference in baseline comparison. (12) Fixed inconsistent coverage claims (60-70% → 40-50% for DSL). (13) Fixed "impossible" → "defeated" in Amnesic Reasoning. (14) Fixed "universal" → "broad" in v1.0.0 version entry. |
+| **3.0.0** | **2026-01-19** | **Critical review response**: (1) Added **Query Classifier Specification** — keyword cascade algorithm with confidence thresholds, classification categories, order of operations, failure modes. (2) Added **Cost of Privacy Model** — latency/API cost/quality/privacy tradeoffs per execution path. (3) Added **User-Facing Failure Model** — "fail visibly, fail safely, offer alternatives" with UX for each failure type. (4) Added **PaaP Schema v1.0** — formal JSON structure for single-step and pipeline programs. (5) Added **Legend Construction Rules** — (Entity Type × Task Type) → Template matrix with escalation path. (6) Added **Hybrid Compilation State Machine** — formal state diagram with transitions and fallback routing. (7) Added **Explicitly Accepted Project Risks** section — NER as Achilles' heel (CRITICAL), PaaP external dependency, Legend leakage quality dependency. (8) Fixed Deno sandbox example (Python → TypeScript). (9) Added V2+ navigation notes. |
 
 ---
 
