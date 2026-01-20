@@ -19,7 +19,19 @@
 ## Current Status
 
 **Phase:** M1 Foundation
-**Progress:** Not started
+**Progress:** In progress — scaffolding complete, starting todo commands
+
+**Completed:**
+- [x] Go project structure (cmd/, internal/)
+- [x] Go module initialized
+- [x] Cobra CLI scaffolding
+- [x] SQLite database package (`internal/db/`)
+
+**Next up:**
+- [ ] `sympal todo add` command
+- [ ] `sympal todo list` command
+- [ ] `sympal todo done` command
+- [ ] `sympal todo delete` command
 
 ---
 
