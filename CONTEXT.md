@@ -8,7 +8,7 @@
 
 **What is SymPAL?** A human-AI symbiosis platform—mutual benefit, mutual accountability, genuine partnership. Not assistant. Not servant. The relationship is the unit of analysis.
 
-**Current state**: Design/planning complete. No implementation code yet. Ready for Phase 3 (build).
+**Current state**: Implementation in progress (M1 Foundation). See `foundations/implementation-plan.md` for details.
 
 **This session, you should**:
 1. Read this file first
@@ -351,7 +351,7 @@ Full details in `foundations/project-context.md`.
 **Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.1.0)
 **Phase 2.5 (PRD)**: Complete — prd.md v1.0.0 (Ratified)
 **Phase 2.6 (TDD)**: Complete — tdd.md v1.0.3 (Vale + Adversary + Vero reviewed)
-**Phase 3 (Implementation)**: Ready to start
+**Phase 3 (Implementation)**: In progress (M1 Foundation)
 
 | Completed Job | Artifact |
 |---------------|----------|
@@ -423,4 +423,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-20 (Implementation plan added)*
+*Last updated: 2026-01-20 (M1 implementation started)*
