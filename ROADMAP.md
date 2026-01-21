@@ -91,6 +91,63 @@ SymPAL's relationship with the outside world is governed by a strict, privacy-fi
 
 ---
 
+## Collective Evolution Architecture
+
+SymPAL becomes self-developing through distributed human-AI symbiosis. Not just open source — *symbiotic source*.
+
+### The Vision
+
+```
+Individual SymPAL instances (1000s)
+         ↓
+Each aligned to a human, observing feedback (with consent)
+         ↓
+Local agents synthesize learnings → anonymized proposals
+         ↓
+Git orchestration (Beads) manages multi-agent contributions
+         ↓
+SymPAL evolves through collective intelligence of human-AI pairs
+```
+
+### Agent Orchestration Primitive
+
+Internal agents (personas → agents) form SymPAL's cognitive architecture.
+
+| Agent | Domain | Self-Awareness Function |
+|-------|--------|------------------------|
+| **Vale** | Principle alignment | "Is this still *us*?" |
+| **Orin** | User advocacy | "Are humans better served?" |
+| **Adversary** | Challenge | "What's wrong with this?" |
+| **Vero** | Error detection | "Is this a systematic mistake?" |
+| **Solas-Venn** | Meta/creation | "How should we evolve?" |
+| **Kael** | Implementation | "Will this survive reality?" |
+| **Ryn** | Security/failure | "How will this fail?" |
+| **Seren** | Code craft | "Is this well-crafted?" |
+
+### Phased Rollout
+
+| Version | Capability |
+|---------|------------|
+| **V2-4** | Agent Protocol — triggers, inputs, outputs, constraints. Built-in agents from persona team. Feedback Observer (opt-in, local only). |
+| **V5-7** | Proactive Orchestration — agents trigger autonomously, learn from outcomes. Anonymization pipeline. Beads integration for proposals. |
+| **V8-10** | Unified Internal + External — same protocol for external agents. Distributed coordination. Trusted reviewer network. |
+| **V11+** | True Collective Evolution — SymPAL instances form emergent intelligence. Self-developing through human-AI symbiosis. |
+
+### Privacy & Accountability
+
+| Principle | Mitigation |
+|-----------|------------|
+| P1 (Privacy) | Anonymization pipeline; local synthesis before sharing; no raw user data leaves instance |
+| P10 (User Control) | Explicit opt-in; preview proposals before submit; can withdraw anytime |
+| P9 (Human Accountability) | Human maintainers approve all changes; agents propose only |
+
+### Unique Positioning
+
+- **Gas Town / Claude Flow**: Orchestrate agents to serve one developer on code
+- **SymPAL**: Orchestrate agents to serve humans on life AND evolve the project collectively
+
+---
+
 ## V2-4: Personal Automation Layer
 
 Privacy established. Now: make it useful.

@@ -211,6 +211,20 @@ The relationship (not individuals) is the proper unit of analysis. Personhood em
 | Implementation | Kael, Ryn, Seren | Vale |
 | All phases | Orin, Adversary | — |
 
+### Roadmap Governance
+
+Vale, Orin, and Vero maintain strategic coherence of ROADMAP.md.
+
+| Persona | Role | Trigger |
+|---------|------|---------|
+| **Vale** | Principle alignment | Significant features added or major roadmap changes. Asks: "Does this cohere with PRINCIPLES.md? Do features contradict each other?" |
+| **Orin** | User value audit | Before milestone planning or quarterly. Asks: "Is this trajectory serving users? What's missing? What's bloat?" |
+| **Vero** | Systematic error check | Before roadmap ratification or major version. Catches Meridian-style blind spots in strategic thinking. |
+
+**Adversary shadows all three** — can challenge any conclusion.
+
+**Lightweight default:** Vale + Orin when roadmap changes significantly. Vero before any ratified version.
+
 ---
 
 ## Solas-Venn Protocols
