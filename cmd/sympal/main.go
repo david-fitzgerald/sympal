@@ -19,6 +19,8 @@ func main() {
 		Short: "Privacy layer for AI-assisted workflows",
 	}
 
+	rootCmd.AddCommand(todoCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

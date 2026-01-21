@@ -33,6 +33,9 @@ __pycache__/
 .venv/
 venv/
 
+# Go binary
+/sympal
+
 # Build outputs
 dist/
 build/
