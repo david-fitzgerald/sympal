@@ -8,7 +8,7 @@
 
 **What is SymPAL?** A human-AI symbiosis platform—mutual benefit, mutual accountability, genuine partnership. Not assistant. Not servant. The relationship is the unit of analysis.
 
-**Current state**: Implementation in progress (M1 Foundation). See `foundations/implementation-plan.md` for details.
+**Current state**: Implementation in progress (M2 Calendar). M1 Foundation complete. See `foundations/implementation-plan.md` for details.
 
 **This session, you should**:
 1. Read this file first
@@ -24,17 +24,16 @@
 ```
 sympal/
 ├── CONTEXT.md              ← This file (CLAUDE.md symlinks here)
-├── PRINCIPLES.md           ← 17 binding principles (v1.0.0, ratified)
+├── PRINCIPLES.md           ← 17 binding principles (v1.1.0, ratified)
 ├── README.md               ← Project overview
 ├── LICENSE                 ← MIT
 │
 ├── foundations/            ← "Why we built it this way"
-│   ├── philosophical-foundations.md   (v1.0.0, 327KB, peer-reviewed)
+│   ├── philosophical-foundations.md   (v0.3.0, 327KB, peer-reviewed)
 │   ├── project-context.md             (v1.1.0, dev context)
 │   ├── principles-discussion.md       (v1.2.0, derivation)
 │   ├── principles-derivation-log.md   (audit trail)
 │   ├── origin-research.md             (v0.2.0, LLM responses on data exploitation)
-│   ├── prd-tdd-plan.md                (v1.0.0, PRD/TDD process guide)
 │   └── reviews/
 │       ├── vero-final-review-philosophical-foundations-v0.2.0.md
 │       ├── vero-review-project-context-v0.3.0.md
@@ -70,7 +69,7 @@ sympal/
     └── test-artifacts/                 ← Flawed materials for testing personas
 ```
 
-**No `src/` or `docs/` folders exist yet** — implementation is Phase 3.
+**Implementation folders**: `cmd/sympal/` (CLI entry points), `internal/` (db, config, log packages).
 
 ---
 
@@ -351,7 +350,7 @@ Full details in `foundations/project-context.md`.
 **Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.1.0)
 **Phase 2.5 (PRD)**: Complete — prd.md v1.0.0 (Ratified)
 **Phase 2.6 (TDD)**: Complete — tdd.md v1.0.3 (Vale + Adversary + Vero reviewed)
-**Phase 3 (Implementation)**: In progress (M1 Foundation)
+**Phase 3 (Implementation)**: In progress (M2 Calendar). M1 Foundation complete.
 
 | Completed Job | Artifact |
 |---------------|----------|
@@ -377,7 +376,7 @@ Full details in `foundations/project-context.md`.
 - privacy-innovations.md v3.0.0 — Privacy architecture details
 
 **Next steps**:
-1. Start M1: Foundation (Go scaffolding, SQLite, Todo CRUD)
+1. Start M2: Calendar (Google Calendar read + `sympal today`)
 2. Follow `foundations/implementation-plan.md` for milestone details and learning approach
 3. TDD has technical specs; implementation-plan.md has session workflow
 
@@ -423,4 +422,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-20 (M1 implementation started)*
+*Last updated: 2026-01-21 (M1 complete, M2 current)*
