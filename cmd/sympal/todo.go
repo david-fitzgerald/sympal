@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/david-fitzgerald/sympal/internal/db"
+	"github.com/david-fitzgerald/sympal/internal/log"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +28,7 @@ var addCmd = &cobra.Command{
 		}
 
 		id, _ := result.LastInsertId()
+		log.Info("todo added", "id", id, "content", content)
 		fmt.Printf("Added todo #%d: %s\n", id, content)
 	},
 }

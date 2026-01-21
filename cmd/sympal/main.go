@@ -6,6 +6,7 @@ import (
 
 	"github.com/david-fitzgerald/sympal/internal/config"
 	"github.com/david-fitzgerald/sympal/internal/db"
+	"github.com/david-fitzgerald/sympal/internal/log"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,11 @@ func main() {
 
 	if err := config.Load(); err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to load config:", err)
+		os.Exit(1)
+	}
+
+	if err := log.Init(); err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to initialise logging:", err)
 		os.Exit(1)
 	}
 
