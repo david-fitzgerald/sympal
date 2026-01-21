@@ -167,6 +167,18 @@ The most critical component of the entire ecosystem. If the Vault fails, trust c
 
 **Why V2-4:** Foundation before economic features. No single point of failure can cause catastrophic loss.
 
+#### Auto-Upgrade System
+
+Keep SymPAL and its ecosystem current without manual intervention. All upgrades require user consent and leverage verifiable builds.
+
+| Component | Description |
+|-----------|-------------|
+| **SymPAL Self-Updates** | Check for new versions, download verified binaries, apply with user approval. Rollback if issues detected. Ties into Trust & Attestation (verifiable builds). |
+| **Foundry Recipe Updates** | Notify when installed community recipes have new versions. Show changelog diff, apply with consent. Version-lock option for stability. |
+| **Dependency Security Patches** | Monitor for CVEs in SymPAL's dependencies. Auto-apply security patches (user-configurable: auto, prompt, manual). Audit log of all patches. |
+
+**Principles:** User controls upgrade policy. All updates cryptographically verified. Can always opt out or roll back.
+
 ### UX Surfaces
 
 #### Theme 1: The "Glass" CLI
