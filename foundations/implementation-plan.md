@@ -18,20 +18,45 @@
 
 ## Current Status
 
-**Phase:** M1 Foundation
-**Progress:** In progress — scaffolding complete, starting todo commands
+**Phase:** M2 Calendar Integration
+**Progress:** Not started
 
-**Completed:**
-- [x] Go project structure (cmd/, internal/)
-- [x] Go module initialized
-- [x] Cobra CLI scaffolding
-- [x] SQLite database package (`internal/db/`)
+**M1 Foundation:** ✅ Complete (2026-01-21)
 
-**Next up:**
-- [ ] `sympal todo add` command
-- [ ] `sympal todo list` command
-- [ ] `sympal todo done` command
-- [ ] `sympal todo delete` command
+---
+
+## Milestone Wrap-Up Procedure
+
+After completing each milestone:
+
+### 1. Manual Testing (All Milestones)
+- Run through all new commands/features
+- Test edge cases (empty inputs, invalid IDs, missing files)
+- Verify nothing broke from previous milestones
+
+### 2. Code Review (Security-Critical Milestones)
+Use personas for M3+ (sandboxing, OAuth, LLM integration):
+
+| Persona | Focus |
+|---------|-------|
+| **Ryn** | Security review — "how will this fail?" |
+| **Seren** | Code craft — "is this well-crafted?" |
+| **Kael** | Implementation — "will this survive reality?" |
+
+**Not needed for:** M1, M2 (low security surface)
+
+### 3. Dogfooding (Starts M1)
+- Add sympal to PATH: `export PATH="$PATH:$(pwd)"`
+- Use daily for real tasks
+- Log friction points for future improvement
+
+### 4. Documentation Update
+- Update this file (Current Status section)
+- Update CONTEXT.md if project status changed
+- Git tag: `git tag v0.x.0-mN`
+
+### 5. Vero Review
+**Not for code** — Vero reviews foundational docs only. Code review uses team personas above.
 
 ---
 
@@ -69,34 +94,30 @@
 
 ## Milestones
 
-### M1: Foundation (Current)
+### M1: Foundation ✅
+
+**Status:** Complete (2026-01-21)
 
 **Deliverables:**
-- [ ] Go project scaffolding (Cobra CLI)
-- [ ] SQLite setup with schema
-- [ ] Todo CRUD (`sympal todo add/list/done/delete`)
-- [ ] Config file handling (`~/.sympal/config.yaml`)
-- [ ] Logging infrastructure (`~/.sympal/sympal.log`)
-- [ ] `sympal log` command (view recent queries)
+- [x] Go project scaffolding (Cobra CLI)
+- [x] SQLite setup with schema
+- [x] Todo CRUD (`sympal todo add/list/done/delete`)
+- [x] Config file handling (`~/.sympal/config.yaml`)
+- [x] Logging infrastructure (`~/.sympal/sympal.log`)
+- [x] `sympal log` command (view recent queries)
 
-**Gate:** Todo CRUD works end-to-end
+**Gate:** ✅ Todo CRUD works end-to-end
 
-**Learning focus:**
+**Learning outcomes:**
 - Go fundamentals (syntax, error handling, packages)
 - CLI structure patterns (Cobra)
 - Project scaffolding (transferable to any Go project)
 - SQLite basics
-- Config/logging patterns
-
-**Approach:**
-1. Scaffold together — explain structure, you create files
-2. First operation (todo add) — write line by line, explain each part
-3. Remaining CRUD — you draft, I review
-4. By end: You can read any Go in codebase and roughly understand it
+- Config/logging patterns (slog for structured logging)
 
 ---
 
-### M2: Calendar Integration
+### M2: Calendar Integration (Current)
 
 **Deliverables:**
 - [ ] Google OAuth flow (system keychain storage)
@@ -205,8 +226,24 @@
 
 ---
 
+## Dogfood Feedback
+
+Friction captured during real use. Address in future iterations.
+
+### M1 (2026-01-21)
+
+| Issue | Notes |
+|-------|-------|
+| `sympal todo` verbose | Shortcuts or alias (`st`?) or natural language |
+| IDs don't reset | #5 gone forever after delete. Dynamic IDs? Or hide IDs entirely, use fuzzy match? |
+| No modify command | Need `sympal todo edit [id] [new content]` |
+| No subcategories | Task grouping/tagging for later |
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.1.0 | 2026-01-20 | Initial plan created |
+| 0.2.0 | 2026-01-21 | M1 complete, added Milestone Wrap-Up Procedure |
