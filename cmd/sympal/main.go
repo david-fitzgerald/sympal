@@ -32,6 +32,7 @@ func main() {
 	}
 
 	rootCmd.AddCommand(todoCmd)
+	rootCmd.AddCommand(logCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
