@@ -228,16 +228,7 @@ Use personas for M3+ (sandboxing, OAuth, LLM integration):
 
 ## Dogfood Feedback
 
-Friction captured during real use. Address in future iterations.
-
-### M1 (2026-01-21)
-
-| Issue | Notes |
-|-------|-------|
-| `sympal todo` verbose | Shortcuts or alias (`st`?) or natural language |
-| IDs don't reset | #5 gone forever after delete. Dynamic IDs? Or hide IDs entirely, use fuzzy match? |
-| No modify command | Need `sympal todo edit [id] [new content]` |
-| No subcategories | Task grouping/tagging for later |
+See [ROADMAP.md](/ROADMAP.md#dogfood-feedback) — single source of truth for friction points and future ideas.
 
 ---
 
