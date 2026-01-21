@@ -8,12 +8,14 @@
 
 **What is SymPAL?** A human-AI symbiosis platform—mutual benefit, mutual accountability, genuine partnership. Not assistant. Not servant. The relationship is the unit of analysis.
 
+**The name**: **Sym** = Symbiosis + Simple (complexity under the hood). **PAL** evolves with the project—see [ROADMAP.md](ROADMAP.md) for the full arc.
+
 **Current state**: Implementation in progress (M2 Calendar). M1 Foundation complete. See `foundations/implementation-plan.md` for details.
 
 **This session, you should**:
 1. Read this file first
 2. Read `foundations/implementation-plan.md` for current milestone and learning approach
-3. Check [GitHub Issues](https://github.com/sympal-ai/sympal/issues) for current task
+3. Check [GitHub Issues](https://github.com/david-fitzgerald/sympal/issues) for current task
 4. Reference PRINCIPLES.md for any design decisions
 5. Use personas for review/challenge work (not creation)
 
@@ -26,50 +28,37 @@ sympal/
 ├── CONTEXT.md              ← This file (CLAUDE.md symlinks here)
 ├── PRINCIPLES.md           ← 17 binding principles (v1.1.0, ratified)
 ├── README.md               ← Project overview
+├── ROADMAP.md              ← V1 milestones, long-term vision, V2+ ideas
 ├── LICENSE                 ← MIT
 │
+├── cmd/sympal/             ← CLI entry points
+│   ├── main.go             (root command, init)
+│   ├── todo.go             (todo CRUD)
+│   └── log_cmd.go          (log viewer)
+│
+├── internal/               ← Core packages
+│   ├── db/                 (SQLite storage)
+│   ├── config/             (YAML config)
+│   └── log/                (structured logging)
+│
 ├── foundations/            ← "Why we built it this way"
-│   ├── philosophical-foundations.md   (v0.3.0, 327KB, peer-reviewed)
+│   ├── prd.md                         (v1.0.0, ratified)
+│   ├── tdd.md                         (v1.0.3, final)
+│   ├── implementation-plan.md         (milestone tracking)
+│   ├── privacy-innovations.md         (v3.0.0, privacy architecture)
+│   ├── philosophical-foundations.md   (v1.0.0, peer-reviewed)
 │   ├── project-context.md             (v1.1.0, dev context)
 │   ├── principles-discussion.md       (v1.2.0, derivation)
-│   ├── principles-derivation-log.md   (audit trail)
-│   ├── origin-research.md             (v0.2.0, LLM responses on data exploitation)
-│   └── reviews/
-│       ├── vero-final-review-philosophical-foundations-v0.2.0.md
-│       ├── vero-review-project-context-v0.3.0.md
-│       ├── vero-review-principles-discussion-v1.1.0.md
-│       ├── vero-review-PRINCIPLES-v1.0.0.md
-│       ├── codex-review-philosophical-foundations-v0.1.1.md
-│       └── gemini-review-philosophical-foundations-v0.1.1.md
+│   └── reviews/                       (audit trail)
 │
-└── prompts/
-    ├── README.md                       ← Persona quick start
-    ├── solas-venn/
-    │   └── Solas-Venn-v3.0.1.md       ← Meta-persona: creates personas
+└── prompts/                ← AI persona architecture
+    ├── solas-venn/         (meta-persona: creates personas)
     ├── personas/
-    │   ├── utility/
-    │   │   └── vero/
-    │   │       └── Vero-Certus-v1.1.md ← Final reviewer for foundational docs
-    │   └── sympal-team/                ← 6-person review ensemble
-    │       ├── vale/                   (philosophy)
-    │       ├── kael/                   (implementation)
-    │       ├── ryn/                    (systems/security)
-    │       ├── seren/                  (code craft)
-    │       ├── orin/                   (user advocacy)
-    │       └── adversary/              (red team)
-    ├── reference/
-    │   ├── prompt-architecture-guide.md
-    │   └── testing-patterns.md
-    ├── research/
-    │   └── team-design-best-practices.md
-    ├── workflows/                      ← PRD/TDD creation prompts
-    │   ├── prd/                        (extraction + synthesis)
-    │   ├── tdd/                        (extraction + synthesis)
-    │   └── principles-checkpoint.md
-    └── test-artifacts/                 ← Flawed materials for testing personas
+    │   ├── utility/vero/   (final reviewer)
+    │   └── sympal-team/    (6-person review ensemble)
+    ├── reference/          (prompt architecture guide, testing patterns)
+    └── workflows/          (PRD/TDD creation prompts)
 ```
-
-**Implementation folders**: `cmd/sympal/` (CLI entry points), `internal/` (db, config, log packages).
 
 ---
 
@@ -300,7 +289,7 @@ When conducting reviews on foundational documents:
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
-Areas: `foundations`, `prompts`, `docs`, `config`, `meta`
+Areas: `feat`, `fix`, `refactor` (code), `foundations`, `prompts`, `docs`, `config`, `meta`
 
 **Commit timing**:
 - After completing a task
@@ -338,7 +327,6 @@ Full details in `foundations/project-context.md`.
 |------------|----------|------------|
 | Claude-primary development | ~90% built with Claude despite LLM-agnosticism | Solas validated across Claude/GPT/Gemini; test post-ship |
 | Solo dev | Limited review bandwidth | Persona ensemble simulates team review |
-| No implementation code | Can't dogfood yet | Principles tested through derivation process |
 
 **Philosophy**: Ship with documented limitations > wait for theoretical completeness.
 
@@ -368,37 +356,28 @@ Full details in `foundations/project-context.md`.
 
 ---
 
-## Current Focus: Ready for Implementation
+## Current Focus: M2 Calendar
 
-**Design phase complete**. All foundational documents reviewed and ratified:
-- PRD v1.0.0 (Ratified) — What we're building
-- TDD v1.0.3 (Final) — How we're building it
-- privacy-innovations.md v3.0.0 — Privacy architecture details
+**M1 Foundation complete.** Todo CRUD, config, logging all working. Dogfooding in progress.
 
-**Next steps**:
-1. Start M2: Calendar (Google Calendar read + `sympal today`)
-2. Follow `foundations/implementation-plan.md` for milestone details and learning approach
-3. TDD has technical specs; implementation-plan.md has session workflow
+**Now building M2:**
+- Google OAuth flow (keychain storage)
+- Calendar API integration (read events)
+- `sympal today` command (todos + calendar)
 
-**Key artifacts**:
+**Key references**:
+- `foundations/implementation-plan.md` — Milestone details, learning approach
+- `foundations/tdd.md` — Technical specs
+- [GitHub Issues](https://github.com/david-fitzgerald/sympal/issues) — Current tasks
 
-In `foundations/`:
-- `prd.md` — Product Requirements Document (v1.0.0, Ratified)
-- `tdd.md` — Technical Design Document (v1.0.3, Final)
-- `privacy-research.md` — Research survey (v0.1.0)
-- `privacy-innovations.md` — Privacy architecture (v3.0.0)
-
-In `foundations/reviews/`:
-- `vale-checkpoint-tdd-v1.0.0.md` — Principles checkpoint
-- `adversary-challenge-tdd-v1.0.1.md` — Systematic critique
-- `vero-review-tdd-v1.0.2.md` — Final review
-
-**V1 Scope**:
-- M1: Foundation (Todo CRUD, logging, config)
-- M2: Calendar (Google Calendar read + create)
-- M3: DSL Compilation (SymQL, Deno sandbox)
-- M4: Ephemeral Slots (NER, projection, rehydration)
-- M5: Local LLM + Integration (Ollama, end-to-end)
+**V1 Milestones**:
+| Milestone | Status | Summary |
+|-----------|--------|---------|
+| M1: Foundation | ✅ Complete | Todo CRUD, config, logging |
+| M2: Calendar | 🔲 In progress | Google Calendar read, `sympal today` |
+| M3: DSL Compilation | 🔲 Planned | SymQL, Deno sandbox |
+| M4: Ephemeral Slots | 🔲 Planned | NER, projection/rehydration |
+| M5: Local LLM | 🔲 Planned | Ollama, end-to-end privacy |
 
 ---
 
