@@ -81,7 +81,7 @@ The name carries this arc. **Sym** is the constant — Symbiosis (mutual benefit
 
 Symbiosis is aspirational until v11. The name reminds us where we're headed while we're laying plumbing.
 
-See [ROADMAP.md](ROADMAP.md) for the full vision.
+See [ROADMAP.md](ROADMAP.md) for the full vision — currently detailed through v2–4; we'll fill in v5+ as the tech evolves.
 
 ## Hard Constraints
 
