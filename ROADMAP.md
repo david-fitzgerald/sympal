@@ -4,6 +4,22 @@
 
 ---
 
+## The Long Arc: What SymPAL Becomes
+
+The name carries the vision. **Sym** is the constant — Symbiosis (mutual benefit between human and AI) and Simple (complexity under the hood, not in your hands). **PAL** evolves as the project matures:
+
+| Version | PAL Expansion | Focus |
+|---------|---------------|-------|
+| **v1** | Privacy Assurance Layer | Privacy-first foundation. Prove data sovereignty works. |
+| **v2–4** | Personal Automation Layer | Privacy + productivity. Useful daily driver. |
+| **v5–7** | Proactive Adaptation Loop | Autonomous agents. Self-improving, feedback cycles. |
+| **v8–10** | Protocol Alignment Layer | Bridge between worlds. Abstraction across AI ecosystems. |
+| **v11+** | Partnership Amplification Lattice | True symbiosis. Mutual growth, structural interdependence. |
+
+**Symbiosis is aspirational until it isn't.** We ship privacy (v1), then utility (v2–4), then agency (v5–7), then interoperability (v8–10) — and only then does the relationship become genuinely mutual. The name reminds us where we're going, even when we're laying plumbing.
+
+---
+
 ## V1 Milestones
 
 | Milestone | Status | Summary |

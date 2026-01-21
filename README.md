@@ -1,6 +1,6 @@
 # SymPAL
 
-Privacy layer for AI-assisted workflows. Use LLMs without becoming a data product.
+Privacy layer for AI-assisted workflows. Use frontier LLMs without becoming a data product.
 
 ## The Problem
 
@@ -10,15 +10,36 @@ Current options force a choice: **privacy OR utility**. SymPAL is the third opti
 
 ## How It Works
 
-SymPAL sits between you and LLM providers, ensuring your data never leaves your control:
+Standard pseudonymization fails: if "Jane" is always "Person_A7", the provider correlates across queries and builds a profile anyway. SymPAL's insight is **single-use randomness** — inspired by the cryptographic one-time pad.
 
-| Privacy Tier | What Happens | Data Exposure |
-|--------------|--------------|---------------|
-| **DSL Compilation** | LLM generates code, not answers. Code runs locally on your data. | Zero — query only, no data sent |
-| **Ephemeral Slots** | Names/entities replaced with placeholders (`[E1]`, `[E2]`). LLM reasons on patterns, not identities. | Pattern only — no PII |
-| **Local LLM** | Runs entirely on your machine via Ollama | Zero — never leaves device |
+### The Three Privacy Tiers
+
+**1. DSL Compilation** — Zero data exposure
+- Cloud LLM generates *code*, not answers — code runs locally on your data
+- Provider sees query structure only, never content
+- Code is SymQL (constrained query language) running in a Deno sandbox — can't do anything malicious
+
+**2. Ephemeral Slots** — Defeats entity profiling
+- Every query replaces names/entities with fresh random placeholders
+- "Jane" becomes `{{PERSON_kestrel}}` in one query, `{{PERSON_falcon}}` in the next
+- LLM gets full context via a single-use "legend" — then the mapping is destroyed
+- Provider sees disconnected pairs that *cannot* be correlated into an entity graph
+
+**3. Local LLM** — Never leaves device
+- Runs entirely on your machine via Ollama
+- For content generation where even patterns shouldn't leak
 
 Every query routes through one of these tiers. No bypass. No "fast mode" that leaks data.
+
+### What Makes Ephemeral Slots Different
+
+| Approach | What Provider Sees Over Time | Can Build Profile? |
+|----------|------------------------------|-------------------|
+| Direct API | "Jane", "Project Phoenix" | Yes — full profile |
+| Pseudonymization | "Person_A7", "Project_B3" | Yes — consistent IDs link queries |
+| **Ephemeral Slots** | `kestrel→sparrow`, then `falcon→finch`... | **No** — disconnected single-use pairs |
+
+The provider can see *that* you use AI for scheduling. They cannot see *who* you're scheduling with.
 
 ## V1 Scope
 
@@ -42,15 +63,25 @@ CLI for privacy-preserving calendar + todo:
 | Principles | Ratified (v1.1.0) |
 | PRD | Ratified (v1.0.0) |
 | TDD | Final (v1.0.3) |
-| Implementation | **M1 in progress** |
+| Implementation | **M1 complete, M2 in progress** |
 
 ## Future: Symbiosis
 
 V1 solves privacy. The longer vision is **symbiosis** — a self-aware, self-evolving layer that grows with you. Mutual benefit, mutual accountability, genuine partnership where both parties can refuse, grow, and change the terms.
 
-The name reflects this ambition: **S**ymbiotic **P**ersonal **A**ugmentation **L**ayer.
+The name carries this arc. **Sym** is the constant — Symbiosis (mutual benefit) and Simple (complexity under the hood, not in your hands). **PAL** evolves:
 
-But first, we ship something useful that keeps your data yours.
+| Version | What PAL Means | Focus |
+|---------|----------------|-------|
+| v1 | Privacy Assurance Layer | Data sovereignty |
+| v2–4 | Personal Automation Layer | Privacy + productivity |
+| v5–7 | Proactive Adaptation Loop | Autonomous, self-improving agents |
+| v8–10 | Protocol Alignment Layer | Bridge across AI ecosystems |
+| v11+ | Partnership Amplification Lattice | True symbiosis |
+
+Symbiosis is aspirational until v11. The name reminds us where we're headed while we're laying plumbing.
+
+See [ROADMAP.md](ROADMAP.md) for the full vision.
 
 ## Hard Constraints
 
@@ -69,13 +100,23 @@ Non-negotiable. See [PRINCIPLES.md](PRINCIPLES.md) for full details.
 ```
 PRINCIPLES.md             # 17 binding principles
 CONTEXT.md                # Project context for LLM sessions
+ROADMAP.md                # V1 milestones, dogfood feedback, V2+ ideas
 
-foundations/
+cmd/sympal/               # CLI entry points
+├── main.go               # Root command, init sequence
+├── todo.go               # Todo CRUD commands
+└── log_cmd.go            # Log viewer
+
+internal/                 # Core packages
+├── db/                   # SQLite storage
+├── config/               # YAML config (~/.sympal/config.yaml)
+└── log/                  # Structured logging (slog)
+
+foundations/              # Design docs
 ├── prd.md                # Product requirements (v1.0.0)
 ├── tdd.md                # Technical design (v1.0.3)
 ├── privacy-innovations.md # Privacy architecture details
-├── implementation-plan.md # Milestone tracking
-└── reviews/              # Persona review outputs
+└── implementation-plan.md # Milestone tracking
 
 prompts/                  # AI persona architecture
 ├── personas/sympal-team/ # Vale, Kael, Ryn, Seren, Orin, Adversary
