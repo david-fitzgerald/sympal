@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/david-fitzgerald/sympal/internal/config"
 	"github.com/david-fitzgerald/sympal/internal/db"
 	"github.com/spf13/cobra"
 )
@@ -11,6 +12,11 @@ import (
 func main() {
 	if err := db.Init(); err != nil {
 		fmt.Fprintln(os.Stderr, "Failed to initialise database", err)
+		os.Exit(1)
+	}
+
+	if err := config.Load(); err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to load config:", err)
 		os.Exit(1)
 	}
 
