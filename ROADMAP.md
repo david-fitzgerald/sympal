@@ -146,6 +146,18 @@ Internal agents (personas → agents) form SymPAL's cognitive architecture.
 | P10 (User Control) | Explicit opt-in; preview proposals before submit; can withdraw anytime |
 | P9 (Human Accountability) | Human maintainers approve all changes; agents propose only |
 
+### "Agents Propose Only" — Permanent Constraint
+
+**Q:** Does "self-developing" conflict with "agents propose only"?
+
+**A:** No. "Self-developing" describes the system's ability to observe, synthesize, and generate improvements autonomously. "Agents propose only" is the accountability gate: humans approve all code changes to SymPAL itself. The agent does the cognitive work; the human holds the merge button.
+
+This is permanent, not a guardrail that relaxes. Even at V11+, agents propose, humans approve. What *may* evolve:
+- **Scope of "significant"**: Early = every change. Later = only architectural changes need explicit approval; routine fixes auto-merge after tests pass.
+- **Who approves**: Early = lead dev. Later = trusted maintainer network.
+
+The constraint ensures P9 (Human Accountability) holds regardless of agent capability.
+
 ### Unique Positioning
 
 - **Gas Town / Claude Flow**: Orchestrate agents to serve one developer on code

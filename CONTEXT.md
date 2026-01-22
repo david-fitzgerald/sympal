@@ -105,7 +105,7 @@ These are ratified and binding. Check PRINCIPLES.md for full text.
 
 ---
 
-## 12 Tensions Under Navigation
+## 13 Tensions Under Navigation
 
 These cannot be resolved—only navigated with trigger conditions. From principles-discussion.md.
 
@@ -123,6 +123,7 @@ These cannot be resolved—only navigated with trigger conditions. From principl
 | Centralization vs. distribution | Distribute by default; centralize only when necessary |
 | Relational vs. interest-based ethics | Relational ethics primary for human-AI; interest-based for human-human |
 | Dogfooding vs. broader adoption | Dogfooding first; broader adoption is downstream validation |
+| Privacy absolutism vs. collective benefit | Anonymization necessary but not sufficient; explicit consent per sharing act; vigilance against de-anonymization |
 
 **When facing a decision that touches a tension**: Identify which tension applies, check the navigation approach, document the tradeoff.
 
