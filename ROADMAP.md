@@ -1,6 +1,9 @@
 # ROADMAP
 
-> Living document for SymPAL direction. V1 milestones are committed scope; V2+ are ideas that may evolve.
+> Living document for SymPAL direction. Sections marked by commitment level:
+> - **COMMITTED**: This is what we're building
+> - **PLANNED**: Intended direction, subject to learning
+> - **EXPLORATORY**: Possibilities, not commitments
 
 ---
 
@@ -20,7 +23,7 @@ The name carries the vision. **Sym** is the constant — Symbiosis (mutual benef
 
 ---
 
-## V1 Milestones
+## V1 Milestones — COMMITTED
 
 | Milestone | Status | Summary |
 |-----------|--------|---------|
@@ -31,6 +34,8 @@ The name carries the vision. **Sym** is the constant — Symbiosis (mutual benef
 | M5: Local LLM | 🔲 Planned | Ollama integration, end-to-end privacy tier |
 
 **V1 Gate:** Daily use by lead dev with ≥50% queries via DSL/Ephemeral Slots.
+
+**V1 Complete When:** M5 ships + 1 week of dogfooding + minor bug patches. Then V2 work begins.
 
 See `foundations/implementation-plan.md` for detailed deliverables.
 
@@ -148,7 +153,7 @@ Internal agents (personas → agents) form SymPAL's cognitive architecture.
 
 ---
 
-## V2-4: Personal Automation Layer
+## V2-4: Personal Automation Layer — PLANNED
 
 Privacy established. Now: make it useful.
 
@@ -183,6 +188,8 @@ Moving beyond explicit commands. Give vague instructions; SymPAL uses the LKG to
 **Example:** You say, "Remind me to follow up with Sarah." SymPAL responds: "Do you mean Sarah from accounting (last mentioned re: Q3 budget) or Sarah from the design team (last mentioned re: Project Chimera)?"
 
 #### The SymPAL Vault
+
+> **Scope note:** Full specification below is the *design vision*. V2-4 deliverable is **keychain integration only** (Secure Enclave/TPM key storage). Shamir recovery, economic features, and advanced protocols are V5+.
 
 The most critical component of the entire ecosystem. If the Vault fails, trust collapses. Goal: as close to "impossible to exploit" as theoretically possible. Assumes failure at every level; defense-in-depth architecture.
 
@@ -222,7 +229,10 @@ The most critical component of the entire ecosystem. If the Vault fails, trust c
 
 **Also:** Named wallets (hide raw keys), multi-currency (BTC, ETH, Solana, Lightning).
 
-**Why V2-4:** Foundation before economic features. No single point of failure can cause catastrophic loss.
+**Phased delivery:**
+- **V2-4:** Keychain integration (Secure Enclave/TPM), basic key storage
+- **V5-7:** Shamir recovery, guardian protocol, policy engine
+- **V8+:** Economic features (micropayments, smart contracts, agent delegation)
 
 #### Auto-Upgrade System
 
@@ -298,7 +308,7 @@ Break SymPAL out of the terminal for quick capture and timely notifications.
 
 ---
 
-## V5-7: Proactive Adaptation Loop
+## V5-7: Proactive Adaptation Loop — EXPLORATORY
 
 From reactive tool to proactive partner. Autonomous agents, self-improving workflows, feedback cycles.
 
@@ -334,7 +344,7 @@ Background agent performing digital hygiene based on your patterns.
 
 ---
 
-## V8-10: Protocol Alignment Layer
+## V8-10: Protocol Alignment Layer — EXPLORATORY
 
 Bridge between worlds. Abstraction across AI ecosystems.
 
@@ -393,7 +403,7 @@ Decentralized, verifiable registry where vendors offer SymPAL-compatible service
 
 ---
 
-## V11+: Partnership Amplification Lattice
+## V11+: Partnership Amplification Lattice — EXPLORATORY
 
 True symbiosis. Mutual growth, structural interdependence.
 
@@ -586,4 +596,4 @@ Dogfood → note friction → add to this doc → revisit during milestone plann
 
 ---
 
-*Last updated: 2026-01-21*
+*Last updated: 2026-01-22*
