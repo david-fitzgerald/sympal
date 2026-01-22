@@ -266,6 +266,7 @@ The CLI is SymPAL's heritage. Instead of replacing it, elevate it into a "glass"
 
 | Feature | Description |
 |---------|-------------|
+| **`pal` Alias** | `pal` works as shorthand for `sympal`. Less typing, same commands. `pal today`, `pal todo add`, etc. |
 | **Interactive TUI** | Full-screen experiences via Bubble Tea. `sympal today` opens an interactive view — arrow keys to select, `d` to mark done, `s` to snooze. Think `lazygit`. |
 | **Natural Language Input** | `sympal remind me to draft the project brief tomorrow afternoon` instead of flags. Parser interprets intent, presents for confirmation. |
 | **LKG-Aware Autocomplete** | `sympal schedule a meeting with <Tab>` suggests people from your LKG, prioritized by recent interaction. `sympal run <Tab>` lists Foundry scripts. |
