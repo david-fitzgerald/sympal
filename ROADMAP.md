@@ -41,6 +41,79 @@ See `foundations/implementation-plan.md` for detailed deliverables.
 
 ---
 
+## V1-V4 Primitives — COMMITTED/PLANNED
+
+Everything else is built on these. Get them right or future vision is blocked.
+
+### Tier 1: Foundational
+
+| Primitive | What It Is | Scope | Status |
+|-----------|------------|-------|--------|
+| **LKG** | Graph database of entities + relationships | Schema, SQLite+FTS, query API | V2-4 |
+| **Privacy Pipeline** | Projection → Slots → Rehydration | Entity extraction, structured I/O, context scaffolding | V1 (M4) + V2 |
+| **Adapter Framework** | Pluggable data ingestion | Interface spec + reference adapters (calendar, files, notes, email) | V2-4 |
+| **Effector Framework** | Pluggable action modules | Interface spec + reference effectors (CLI, notifications, file) | V2-4 |
+| **Agent Protocol** | Triggers, inputs, outputs, constraints | Spec + observation hooks + built-in agents | V2-4 |
+
+### Tier 2: Platform
+
+| Primitive | What It Is | Scope | Status |
+|-----------|------------|-------|--------|
+| **SymQL Runtime** | DSL interpreter + sandbox | Grammar, interpreter, capability-tiered sandbox | V1 (M3) |
+| **Vault Core** | Hardware-backed key storage | Keychain integration (Secure Enclave/TPM) | V2-4 |
+| **Audit Subsystem** | Append-only log | Transaction log, verifiable builds | V2-4 |
+| **LLM Abstraction** | Unified model interface | Model-agnostic query/response, provider routing | V2-4 |
+
+### Dependency Graph
+
+```
+                         ┌──────────────┐
+                         │     LKG      │ ← The spine
+                         └──────┬───────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        │                       │                       │
+        ▼                       ▼                       ▼
+┌───────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│    Adapter    │    │ Privacy Pipeline │    │  SymQL Runtime   │
+│   Framework   │───▶│ + Context Scaff  │    │                  │
+│ (populates)   │    │ (projects)       │    │ (queries)        │
+└───────────────┘    └──────────────────┘    └──────────────────┘
+                                │
+                                ▼
+                     ┌──────────────────┐
+                     │  Agent Protocol  │
+                     │ (orchestrates)   │
+                     └──────────────────┘
+                                │
+                                ▼
+                     ┌──────────────────┐
+                     │    Effector      │
+                     │   Framework      │
+                     │ (acts)           │
+                     └──────────────────┘
+
+Independent:
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Vault Core  │  │    Audit     │  │     LLM      │
+│              │  │  Subsystem   │  │  Abstraction │
+└──────────────┘  └──────────────┘  └──────────────┘
+```
+
+### Critical Constraints (from Ryn's review)
+
+Design these now to avoid blocking future vision:
+
+| Primitive | Constraint | Why It Matters |
+|-----------|------------|----------------|
+| **LKG** | Property graph schema (not rigid tables) | V5+ needs rich relationship queries |
+| **Privacy Pipeline** | Structured I/O (not text-only) | V8+ needs JSON/API rehydration |
+| **Agent Protocol** | Output bus + observation hooks | Collective Evolution needs inter-agent synthesis |
+| **Vault** | Hierarchical key derivation | V8+ needs scoped agent spending authority |
+| **SymQL** | Capability-tiered sandbox | Foundry needs controlled escape hatches |
+
+---
+
 ## Dogfood Feedback
 
 Friction captured during real use. Informs future iterations.
