@@ -195,9 +195,31 @@ Evolves V1's DSL Compilation. Instead of one-off code generation, the LLM writes
 
 #### Intent-Based Actions & Disambiguation
 
-Moving beyond explicit commands. Give vague instructions; SymPAL uses the LKG to ask clarifying questions.
+Moving beyond explicit commands. Give vague instructions; SymPAL clarifies before acting.
 
-**Example:** You say, "Remind me to follow up with Sarah." SymPAL responds: "Do you mean Sarah from accounting (last mentioned re: Q3 budget) or Sarah from the design team (last mentioned re: Project Chimera)?"
+**Implementation approach — simplest first:**
+
+| Ambiguity Type | Resolution | LLM Required? |
+|----------------|------------|---------------|
+| **Entity** ("Which Sarah?") | LKG query → if multiple matches, present choices | No |
+| **Intent** ("What's 'follow up'?") | Pattern match common phrases → offer options | No |
+| **Unclear reference** ("that thing we discussed") | Local LLM interprets context | Yes (fallback) |
+
+**Flow:**
+```
+1. Parse input for entity references
+2. LKG query for matches
+3. Ambiguous entities → present choices (template, no LLM)
+4. Ambiguous intent → pattern match first (call/email/meeting)
+5. Truly unclear → local LLM fallback
+```
+
+**Example:** "Remind me to follow up with Sarah"
+- LKG query finds 2 Sarahs → "Sarah Chen (Acme Corp, last: Q3 budget) or Sarah Miller (Design Team, last: Project Chimera)?"
+- User picks → "follow up" pattern matches → offer: call / email / meeting / other
+- No LLM touched for common path
+
+**Why:** Keeps disambiguation fast, predictable, and LLM-independent. Local LLM is the exception, not the rule.
 
 #### The SymPAL Vault
 
