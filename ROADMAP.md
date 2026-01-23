@@ -544,12 +544,37 @@ The Ephemeral Slots paradigm scales from V1 entity replacement to complete priva
 |---------|------------|-------------------|
 | V1.5 | Dynamic Legend Optimization | Minimal random slots — task-adaptive detail |
 | V2 | Composable & Nested Slots | Abstract relational structures (teams, hierarchies) |
+| V2 | Ephemeral Context Scaffolding | Query-relevant LKG context, fully abstracted |
 | V2.5 | Functional Slots | Abstract processes and workflows |
 | V3 | The Ephemeral Self | Per-query digital twin — complete ghost |
 
 **V1.5: Dynamic Legend Optimization** — Legend detail adapts to task automatically. Scheduling gets minimal context; sensitive advice gets detailed relationships. Rule-based initially, learns from feedback.
 
 **V2: Composable & Nested Slots** — Slots contain other slots. Model org hierarchies, project dependencies, relationships as abstract structures. "A depends on B" without knowing what A or B are.
+
+**V2: Ephemeral Context Scaffolding** — Critical for response quality. The LKG dynamically extracts query-relevant context and projects it alongside entities:
+
+```
+Query: "Help me prep for meeting with Sarah about Project X"
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │   LKG Extraction    │
+                    │   - Entity nodes    │
+                    │   - Relationships   │
+                    │   - Temporal data   │
+                    │   - Status/sentiment│
+                    └──────────┬──────────┘
+                               │
+                               ▼
+              Cloud LLM receives abstracted scaffold:
+              - {{EVENT_A}}: 5th in 7 days (frequent)
+              - {{PROJECT_C}}: delayed 2x, critical, revenue
+              - {{PERSON_B}}: senior, blocker, resistant
+              - Tension detected between {{PERSON_B}} and {{PROJECT_C}}
+```
+
+Without this, Ephemeral Slots protect privacy but degrade response quality. With it, the frontier LLM reasons about rich context (meeting frequency, project pressure, stakeholder dynamics) without ever seeing real names, projects, or companies. The LKG becomes the source of contextual intelligence, not just entity storage.
 
 **V2.5: Functional Slots** — Slots evolve from nouns to verbs. Represent processes, workflows, rules. LLM reasons about your business logic abstractly.
 
