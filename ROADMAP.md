@@ -603,6 +603,71 @@ The Ephemeral Slots paradigm scales from V1 entity replacement to complete priva
 
 ---
 
+## Design Consideration: Context vs. Privacy Tradeoff
+
+**The tension:** Persistent context (like CLAUDE.md) makes LLM responses high-quality. But sending rich context exposes preferences, patterns, and domain knowledge — even if Ephemeral Slots protect entity data in queries.
+
+### Context Tiers
+
+| Tier | Content | Privacy Risk | Treatment |
+|------|---------|--------------|-----------|
+| **1: Technical** | Language, architecture, patterns, conventions | Low | Safe to send to cloud LLM |
+| **2: Preferences** | Working style, response format, spelling | Medium | Send or anonymize per user choice |
+| **3: Personal** | People, projects, relationships, specifics | High | Ephemeral Slots or local-only |
+
+### Hybrid Architecture: Local Context + Remote Reasoning
+
+The recommended approach combines cloud reasoning power with local personalization:
+
+```
+User Query (full context)
+         │
+         ▼
+┌─────────────────────────┐
+│   Local Preprocessing   │
+│   - Tier 3 → Slots      │
+│   - Tier 1-2 preserved  │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│       Cloud LLM         │
+│   - Technical context   │
+│   - Abstracted query    │
+│   - Returns structure   │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  Local LLM (Rehydrate)  │
+│   - Full context        │
+│   - Personalize output  │
+│   - Lower capability OK │
+└───────────┬─────────────┘
+            │
+            ▼
+    Rich, Private Response
+```
+
+**Why local LLM quality is sufficient:** Rehydration and personalization are easier tasks than original reasoning. A 7B local model can apply context and fill placeholders even if it can't match frontier models on novel synthesis.
+
+**Local LLM trajectory:** Frontier models will likely maintain a 6-9 month lead on general reasoning. But for specific tasks (rehydration, context application), local models are already sufficient and improving.
+
+### User Control
+
+Users should be able to choose their position on the quality/privacy spectrum:
+
+| Mode | What It Sends | Quality | Privacy |
+|------|---------------|---------|---------|
+| **Max Privacy** | Minimal context, heavy Slots | Lower | Highest |
+| **Balanced** | Tier 1-2 context, Slots for Tier 3 | Good | High |
+| **Max Quality** | Full context (local LLM only) | Depends on local model | Highest |
+| **Trust Mode** | Full context to cloud | Highest | User accepts exposure |
+
+**Placement:** Core to V2-4 Privacy Pipeline design. Inform architecture before implementation.
+
+---
+
 ## Contributing Ideas
 
 Dogfood → note friction → add to this doc → revisit during milestone planning.
