@@ -19,7 +19,7 @@
 ## Current Status
 
 **Phase:** M2 Calendar Integration
-**Progress:** In progress (~30%)
+**Progress:** In progress (~40%)
 
 **M1 Foundation:** ✅ Complete (2026-01-21)
 
@@ -29,17 +29,22 @@
 |-----------|--------|-------|
 | `internal/keyring/` | ✅ Complete | Token save/load via system keychain |
 | `internal/config/` | ✅ Complete | GoogleConfig struct added |
-| `internal/auth/google.go` | 🔲 Skeleton | URL builder only, needs: state gen, callback server, token exchange |
+| `internal/auth/google.go` | 🔶 In progress | State gen + browser launcher done; callback server next |
 | Calendar API client | 🔲 Not started | — |
 | `sympal auth` command | 🔲 Not started | — |
 | `sympal today` command | 🔲 Not started | — |
 
-**Next steps:**
-1. Implement secure state generation (crypto/rand)
-2. Build callback HTTP server (localhost:8080)
-3. Token exchange with Google
-4. Wire up keyring storage
-5. Add CLI commands
+### Resume Point (2026-01-24)
+
+**Next session starts at:** Step 3 — Callback HTTP server
+
+Auth flow steps:
+1. ✅ Secure state generation (crypto/rand)
+2. ✅ Browser launcher (os/exec)
+3. 🔲 **Callback HTTP server** ← RESUME HERE
+4. 🔲 Token exchange with Google
+5. 🔲 Wire up keyring storage
+6. 🔲 Add CLI commands
 
 ---
 

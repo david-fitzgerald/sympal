@@ -377,15 +377,15 @@ Full details in `foundations/project-context.md`.
 
 **M1 Foundation complete.** Todo CRUD, config, logging all working. Dogfooding in progress.
 
-**M2 Progress (~30%):**
+**M2 Progress (~40%):**
 
 | Component | Status |
 |-----------|--------|
 | `internal/keyring/` | ✅ Complete — token save/load via system keychain |
 | `internal/config/` | ✅ Complete — GoogleConfig struct added |
-| `internal/auth/google.go` | 🔲 Skeleton — URL builder only |
+| `internal/auth/google.go` | 🔶 In progress — state gen + browser launcher done |
 
-**Next up:** Secure state generation → callback HTTP server → token exchange
+**Resume point:** Step 3 — Callback HTTP server (see implementation-plan.md for details)
 
 **Key references**:
 - `foundations/implementation-plan.md` — Milestone details, learning approach
@@ -423,4 +423,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-24 (M2 ~30%: keyring + config complete, auth skeleton in progress)*
+*Last updated: 2026-01-24 (M2 ~40%: auth state gen + browser launcher done, callback server next)*
