@@ -37,8 +37,10 @@ sympal/
 │   └── log_cmd.go          (log viewer)
 │
 ├── internal/               ← Core packages
+│   ├── auth/               (OAuth flows - M2)
+│   ├── config/             (YAML config + Google OAuth)
 │   ├── db/                 (SQLite storage)
-│   ├── config/             (YAML config)
+│   ├── keyring/            (system keychain token storage - M2)
 │   └── log/                (structured logging)
 │
 ├── foundations/            ← "Why we built it this way"
@@ -375,10 +377,15 @@ Full details in `foundations/project-context.md`.
 
 **M1 Foundation complete.** Todo CRUD, config, logging all working. Dogfooding in progress.
 
-**Now building M2:**
-- Google OAuth flow (keychain storage)
-- Calendar API integration (read events)
-- `sympal today` command (todos + calendar)
+**M2 Progress (~30%):**
+
+| Component | Status |
+|-----------|--------|
+| `internal/keyring/` | ✅ Complete — token save/load via system keychain |
+| `internal/config/` | ✅ Complete — GoogleConfig struct added |
+| `internal/auth/google.go` | 🔲 Skeleton — URL builder only |
+
+**Next up:** Secure state generation → callback HTTP server → token exchange
 
 **Key references**:
 - `foundations/implementation-plan.md` — Milestone details, learning approach
@@ -416,4 +423,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-21 (M1 complete, M2 current)*
+*Last updated: 2026-01-24 (M2 ~30%: keyring + config complete, auth skeleton in progress)*

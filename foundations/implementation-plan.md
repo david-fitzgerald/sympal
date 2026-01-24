@@ -19,9 +19,27 @@
 ## Current Status
 
 **Phase:** M2 Calendar Integration
-**Progress:** Not started
+**Progress:** In progress (~30%)
 
 **M1 Foundation:** ✅ Complete (2026-01-21)
+
+### M2 Progress Detail
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| `internal/keyring/` | ✅ Complete | Token save/load via system keychain |
+| `internal/config/` | ✅ Complete | GoogleConfig struct added |
+| `internal/auth/google.go` | 🔲 Skeleton | URL builder only, needs: state gen, callback server, token exchange |
+| Calendar API client | 🔲 Not started | — |
+| `sympal auth` command | 🔲 Not started | — |
+| `sympal today` command | 🔲 Not started | — |
+
+**Next steps:**
+1. Implement secure state generation (crypto/rand)
+2. Build callback HTTP server (localhost:8080)
+3. Token exchange with Google
+4. Wire up keyring storage
+5. Add CLI commands
 
 ---
 
@@ -238,3 +256,4 @@ See [ROADMAP.md](/ROADMAP.md#dogfood-feedback) — single source of truth for fr
 |---------|------|---------|
 | 0.1.0 | 2026-01-20 | Initial plan created |
 | 0.2.0 | 2026-01-21 | M1 complete, added Milestone Wrap-Up Procedure |
+| 0.3.0 | 2026-01-24 | M2 in progress (~30%): keyring + config complete, auth skeleton |
