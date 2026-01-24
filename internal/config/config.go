@@ -8,7 +8,13 @@ import (
 )
 
 type Config struct {
-	LogLevel string `yaml:"log_level"`
+	LogLevel string       `yaml:"log_level"`
+	Google   GoogleConfig `yaml:"google"`
+}
+
+type GoogleConfig struct {
+	ClientID     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
 }
 
 var Current Config
