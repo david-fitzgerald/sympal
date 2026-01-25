@@ -34,15 +34,15 @@
 | `sympal auth` command | 🔲 Not started | — |
 | `sympal today` command | 🔲 Not started | — |
 
-### Resume Point (2026-01-24)
+### Resume Point (2026-01-25)
 
-**Next session starts at:** Step 3 — Callback HTTP server
+**Next session starts at:** Step 4 — Token exchange with Google
 
 Auth flow steps:
 1. ✅ Secure state generation (crypto/rand)
 2. ✅ Browser launcher (os/exec)
-3. 🔲 **Callback HTTP server** ← RESUME HERE
-4. 🔲 Token exchange with Google
+3. ✅ Callback HTTP server (channel coordination, goroutine)
+4. 🔲 **Token exchange with Google** ← RESUME HERE
 5. 🔲 Wire up keyring storage
 6. 🔲 Add CLI commands
 
