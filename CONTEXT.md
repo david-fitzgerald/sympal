@@ -18,6 +18,7 @@
 3. Check [GitHub Issues](https://github.com/david-fitzgerald/sympal/issues) for current task
 4. Reference PRINCIPLES.md for any design decisions
 5. Use personas for review/challenge work (not creation)
+6. For coding work, follow Teaching Mode (see ~/.claude/TEACHING.md) — user writes all code, Claude teaches
 
 ---
 
@@ -177,7 +178,7 @@ The relationship (not individuals) is the proper unit of analysis. Personhood em
 
 ### When NOT to Use
 
-- **Creating** code, docs, designs (that's human + Claude)
+- **Creating** code, docs, designs (user writes with Claude teaching, not Claude generating)
 - **Making final decisions** (that's lead dev's role)
 
 ### The Team
@@ -323,7 +324,7 @@ Full details in `foundations/project-context.md`.
 
 **Constraints**:
 - Variable time: 30+ hrs/wk → periods of 5-10 hrs
-- Basic coding skills (requires AI assistance)
+- Basic coding skills (Claude teaches, user writes — see TEACHING.md)
 - LLM-agnostic + open source: hard requirements
 
 **Known Biases** (actively watch for):
@@ -333,6 +334,8 @@ Full details in `foundations/project-context.md`.
 | Overplanning | "What would we learn by building instead?" |
 | Idealism over pragmatism | GTM instincts are also correct |
 | Learning-as-excuse | Name this conflict when it's happening |
+
+**Note:** "Learning-as-excuse" refers to avoiding shipping entirely. Learning-while-building (Teaching Mode) is the intended approach — see TEACHING.md.
 
 **Success criteria**: Lead dev uses SymPAL daily. No external metrics. No deadline.
 
