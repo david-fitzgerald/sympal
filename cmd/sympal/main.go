@@ -33,6 +33,7 @@ func main() {
 
 	rootCmd.AddCommand(todoCmd)
 	rootCmd.AddCommand(logCmd)
+	rootCmd.AddCommand(authCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

@@ -4,9 +4,14 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"os/exec"
+
+	"github.com/david-fitzgerald/sympal/internal/keyring"
 )
 
 const (
@@ -21,10 +26,38 @@ type authResult struct {
 	error error
 }
 
-func Authenticate(clientID, clientSecret string) (string, error) {
+type tokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
+	TokenType    string `json:"token_type"`
+}
+
+func exchangeToken(code, clientID, clientSecret string) (*tokenResponse, error) {
+	resp, err := http.PostForm(tokenURL, url.Values{"code": {code}, "client_id": {clientID}, "client_secret": {clientSecret}, "redirect_uri": {redirectURL}, "grant_type": {"authorization_code"}})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var token tokenResponse
+	err = json.Unmarshal(body, &token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
+func Authenticate(clientID, clientSecret string) (*tokenResponse, error) {
 	state, err := generateState()
 	if err != nil {
-		return "", fmt.Errorf("Failed to generate state: %w", err)
+		return nil, fmt.Errorf("Failed to generate state: %w", err)
 	}
 	resultChan := make(chan authResult)
 	mux := http.NewServeMux()
@@ -45,16 +78,27 @@ func Authenticate(clientID, clientSecret string) (string, error) {
 
 	fmt.Println("Opening browser for authentication...")
 	if err := openBrowser(fullURL); err != nil {
-		return "", fmt.Errorf("Failed to open browser: %w", err)
+		return nil, fmt.Errorf("Failed to open browser: %w", err)
 	}
 
 	result := <-resultChan
 	server.Shutdown(context.Background())
 
 	if result.error != nil {
-		return "", result.error
+		return nil, result.error
 	}
-	return result.code, nil
+
+	token, err := exchangeToken(result.code, clientID, clientSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	err = keyring.SaveTokens(token.AccessToken, token.RefreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
 }
 
 func generateState() (string, error) {
