@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/david-fitzgerald/sympal/internal/keyring"
@@ -45,8 +46,8 @@ func GetTodayEvents() ([]Event, error) {
 	timeMin := startOfDay.Format(time.RFC3339)
 	timeMax := endOfDay.Format(time.RFC3339)
 
-	url := fmt.Sprintf("https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=%s&timeMax=%s&singleEvents=true", timeMin, timeMax)
-	req, err := http.NewRequest("GET", url, nil)
+	requestURL := fmt.Sprintf("https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=%s&timeMax=%s&singleEvents=true", url.QueryEscape(timeMin), url.QueryEscape(timeMax))
+	req, err := http.NewRequest("GET", requestURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +89,7 @@ func GetTodayEvents() ([]Event, error) {
 			EndTime:   endTime,
 		})
 	}
+	// Return events
 	return events, nil
 
-	// Return events
 }
