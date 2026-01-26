@@ -376,19 +376,22 @@ Full details in `foundations/project-context.md`.
 
 ---
 
-## Current Focus: M2 Calendar
+## Current Focus: M3 Planning
 
 **M1 Foundation complete.** Todo CRUD, config, logging all working. Dogfooding in progress.
 
-**M2 Progress (~50%):**
+**M2 Calendar complete.** OAuth flow, calendar API, `sympal today` all working.
 
 | Component | Status |
 |-----------|--------|
 | `internal/keyring/` | ✅ Complete — token save/load via system keychain |
 | `internal/config/` | ✅ Complete — GoogleConfig struct added |
-| `internal/auth/google.go` | 🔶 In progress — callback server done, token exchange next |
+| `internal/auth/google.go` | ✅ Complete — full OAuth flow with token exchange |
+| `internal/calendar/` | ✅ Complete — Google Calendar API client |
+| `sympal auth` | ✅ Complete — triggers OAuth flow |
+| `sympal today` | ✅ Complete — displays today's calendar events |
 
-**Resume point:** Step 4 — Token exchange with Google (see implementation-plan.md for details)
+**Resume point:** M3 planning or M2 polish (see implementation-plan.md)
 
 **Key references**:
 - `foundations/implementation-plan.md` — Milestone details, learning approach
@@ -399,7 +402,7 @@ Full details in `foundations/project-context.md`.
 | Milestone | Status | Summary |
 |-----------|--------|---------|
 | M1: Foundation | ✅ Complete | Todo CRUD, config, logging |
-| M2: Calendar | 🔲 In progress | Google Calendar read, `sympal today` |
+| M2: Calendar | ✅ Complete | Google Calendar read, `sympal today` |
 | M3: DSL Compilation | 🔲 Planned | SymQL, Deno sandbox |
 | M4: Ephemeral Slots | 🔲 Planned | NER, projection/rehydration |
 | M5: Local LLM | 🔲 Planned | Ollama, end-to-end privacy |
@@ -426,4 +429,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-25 (M2 ~50%: callback server complete, token exchange next)*
+*Last updated: 2026-01-26 (M2 complete: OAuth flow, calendar API, sympal today all working)*

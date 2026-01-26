@@ -19,7 +19,7 @@
 ## Current Status
 
 **Phase:** M2 Calendar Integration
-**Progress:** In progress (~40%)
+**Progress:** ✅ Complete (2026-01-26)
 
 **M1 Foundation:** ✅ Complete (2026-01-21)
 
@@ -29,22 +29,27 @@
 |-----------|--------|-------|
 | `internal/keyring/` | ✅ Complete | Token save/load via system keychain |
 | `internal/config/` | ✅ Complete | GoogleConfig struct added |
-| `internal/auth/google.go` | 🔶 In progress | State gen + browser launcher done; callback server next |
-| Calendar API client | 🔲 Not started | — |
-| `sympal auth` command | 🔲 Not started | — |
-| `sympal today` command | 🔲 Not started | — |
+| `internal/auth/google.go` | ✅ Complete | Full OAuth flow with token exchange |
+| `internal/calendar/` | ✅ Complete | Google Calendar API client |
+| `sympal auth` command | ✅ Complete | Triggers OAuth flow |
+| `sympal today` command | ✅ Complete | Displays today's calendar events |
 
-### Resume Point (2026-01-25)
+### Resume Point (2026-01-26)
 
-**Next session starts at:** Step 4 — Token exchange with Google
+**M2 complete.** Next session: M3 planning or M2 polish.
 
-Auth flow steps:
+Possible M2 polish:
+- Add todos to `sympal today` output
+- Handle token refresh (currently requires re-auth after ~1hr)
+- Add HTTP status code checking before parsing response
+
+Auth flow steps (all complete):
 1. ✅ Secure state generation (crypto/rand)
 2. ✅ Browser launcher (os/exec)
 3. ✅ Callback HTTP server (channel coordination, goroutine)
-4. 🔲 **Token exchange with Google** ← RESUME HERE
-5. 🔲 Wire up keyring storage
-6. 🔲 Add CLI commands
+4. ✅ Token exchange with Google
+5. ✅ Wire up keyring storage
+6. ✅ Add CLI commands
 
 ---
 
@@ -262,3 +267,4 @@ See [ROADMAP.md](/ROADMAP.md#dogfood-feedback) — single source of truth for fr
 | 0.1.0 | 2026-01-20 | Initial plan created |
 | 0.2.0 | 2026-01-21 | M1 complete, added Milestone Wrap-Up Procedure |
 | 0.3.0 | 2026-01-24 | M2 in progress (~30%): keyring + config complete, auth skeleton |
+| 0.4.0 | 2026-01-26 | M2 complete: OAuth flow, calendar API, `sympal auth`, `sympal today` |
