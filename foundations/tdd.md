@@ -1,8 +1,8 @@
 # SymPAL Technical Design Document
 
-**Version:** 1.1.0
+**Version:** 1.2.0-draft
 **Date:** 2026-01-27
-**Status:** Active (M3 spec synced with privacy-innovations.md)
+**Status:** Draft (full sync with privacy-innovations.md — pending team + Vero review)
 **Author:** Kael + Ryn (synthesis from Lead Dev interview + delta)
 **PRD Reference:** foundations/prd.md (v1.0.0)
 **Privacy Reference:** foundations/privacy-innovations.md (v3.0.0)
@@ -214,6 +214,29 @@ With decomposition:
 
 **Benefit**: Minimizes data processed even within zero-exposure tiers.
 
+#### State Machine
+
+```
+CLASSIFY_HYBRID
+    │
+    ▼
+COMPILE_FILTER (generate SymQL for filter portion)
+    │
+    ▼
+EXECUTE_FILTER (run SymQL locally)
+    │
+    ▼
+CHECK_FILTER_RESULT
+    │
+    ├── If meaningful reduction (>50% filtered) → ROUTE_CONTENT
+    │
+    └── If minimal reduction (<50% filtered) → ROUTE_FULL_TO_LOCAL
+```
+
+**Meaningful reduction threshold**: 50%. If DSL doesn't meaningfully reduce the dataset, skip decomposition and route full query to Local LLM.
+
+**V1 Scope**: Explicit hybrid patterns only (content verb + structured keyword). Expand detection with confidence in V1.5.
+
 ---
 
 ## Privacy Tier Implementation
@@ -297,6 +320,35 @@ RETURN result
 
 If >30% of "structured-looking" queries can't be expressed, expand grammar in V1.5.
 
+#### DSL Hardening (V1)
+
+**Golden-Set Test Harness**
+
+Before running compiled SymQL on real data, validate against synthetic test cases:
+1. Auto-generate small synthetic datasets matching schema
+2. Run compiled SymQL against synthetic data
+3. Verify output matches expected results
+4. Only then execute against real data
+
+**Benefit**: Prevents data exposure during testing; catches logic errors before real execution.
+
+**Semantic Type Guards**
+
+Validate types and bounds before execution:
+- Date fields receive valid dates (not strings)
+- Numeric comparisons use numbers
+- LIMIT values are reasonable (1-1000)
+- Field names exist in schema
+
+**Deterministic Canonicalization**
+
+Normalize queries to reduce variance in Claude's output:
+- Standard field ordering
+- Consistent whitespace
+- Predictable placeholder naming
+
+Reduces prompt sensitivity and improves cache hit rates.
+
 ### Tier 2: Ephemeral Slots (Pattern-Only Exposure)
 
 **How it works**:
@@ -318,7 +370,22 @@ If >30% of "structured-looking" queries can't be expressed, expand grammar in V1
 | REASONING | Relationship + context | `[E1] is my manager, high-stakes relationship` |
 | DRAFTING | Relationship + tone | `[E1] is my client, formal tone preferred` |
 
-Escalation only if quality degrades (rare with good defaults).
+**Escalation Framework**:
+
+| Level | Detail | When Used |
+|-------|--------|-----------|
+| Ultra-minimal | Type only | Calendar scheduling (low reasoning) |
+| Minimal | Type + role | Simple queries |
+| Standard | Type + role + context | Reasoning tasks |
+| Detailed | Full relationship | Complex drafting |
+
+**Escalation rules**:
+- Start at task-appropriate default
+- Escalate only if quality degrades
+- Track escalation frequency — if >30% of queries escalate, re-evaluate defaults
+- Escalation is per-task, not per-entity (same entity can have different legend detail for different tasks)
+
+**Leakage warning**: Over-escalation defeats privacy. Detailed legends can identify entities without names.
 
 **NER Confidence Handling**:
 - HIGH (>0.8): Auto-accept
@@ -341,6 +408,29 @@ Escalation only if quality degrades (rare with good defaults).
 
 **Mitigation for "wrong placeholder"**: If response references placeholder in semantically inconsistent context (e.g., legend says `[E1]` is a person but response says "the project [E1]"), flag for user review rather than auto-rehydrating.
 
+**Rehydration Pipeline** (5 steps):
+1. **Validate response** — Check JSON structure, placeholder format
+2. **Detect unbound placeholders** — Flag any `[Ex]` not in legend
+3. **Handle possessives** — `[E1]'s` → expand correctly
+4. **Case variations** — Match `[E1]`, `[e1]`, etc.
+5. **Escape user input** — Prevent injection via entity names
+
+**Fallback cascade** (if rehydration fails):
+1. Retry with stricter prompt (explicit format instructions)
+2. Route to Local LLM (full data, zero exposure)
+3. Return partial result with warning (show anonymized response)
+
+**Known Failure Cases** (route to Local LLM instead):
+
+| Pattern | Why It Fails | Route To |
+|---------|--------------|----------|
+| Follow-up queries | Requires previous context | Local LLM |
+| Reminders/recurring | Needs entity consistency over time | Local LLM |
+| Multi-turn conversations | Consistent references across queries | Local LLM |
+| Longitudinal summaries | "How has X changed?" needs history | Local LLM |
+
+These patterns require consistent entity references that Ephemeral Slots (single-use placeholders) cannot provide.
+
 ### Tier 3: Local LLM (Zero Exposure)
 
 **How it works**:
@@ -360,10 +450,14 @@ Escalation only if quality degrades (rare with good defaults).
 |------|---------|-----------|-----------|---------|---------|
 | **Heuristic/Template** | ~50ms | 0 | $0 | Low (rigid) | Zero exposure |
 | **DSL Compilation** | 1-2s | 1 cloud | ~$0.002 | High (logic) | Zero exposure |
+| **Hybrid (DSL → Local)** | 2-4s | 1 cloud | ~$0.002 | High | Zero exposure |
 | **Ephemeral Slots** | 1-3s | 1 cloud | ~$0.003 | High | Pattern-only |
+| **Hybrid (DSL → Ephemeral)** | 2-4s | 2 cloud | ~$0.005 | High | Zero → Pattern |
 | **Local LLM only** | 2-5s | 0 | $0 | Medium-Low | Zero exposure |
 
 V1 target: 60-70% of queries hit DSL or Ephemeral Slots (cloud, high quality, privacy-preserved).
+
+**Cost optimization**: DSL + Local Hybrid paths achieve high quality at ~$0.002 with zero exposure by filtering first, then processing locally.
 
 ---
 
@@ -378,11 +472,85 @@ V1 target: 60-70% of queries hit DSL or Ephemeral Slots (cloud, high quality, pr
 | Rehydration fails | "Got a response but couldn't match it back to your data. Here's the raw result: [...]" | Show anonymized response, log for debugging |
 | Sandbox timeout | "Query took too long. Try a simpler question." | Kill process, log |
 | Local LLM unavailable | "Local AI not running. Start Ollama, or I can try cloud (less private)." | Offer cloud fallback with explicit consent |
+| Policy gate blocks | "This query would send [field] to cloud. Allow once / Always allow / Use local instead?" | Prompt for consent, log decision |
 
 **Design principles**:
 1. Never silently fail
-2. Never expose raw data on failure
-3. Always offer a path forward
+2. Never silently degrade privacy
+3. Never expose raw data on failure
+4. Always offer a path forward
+5. Explain in plain language what happened
+
+---
+
+## User Control Mechanisms (V1)
+
+### Progressive Consent Ladder
+
+Micro-consent per data type. Permissions build incrementally.
+
+**Flow example**:
+1. First calendar query: "Allow SymPAL to read calendar titles?" [Yes/No]
+2. User allows calendar titles
+3. Later: "This query needs attendee names. Allow?" [Yes/No]
+4. Permissions accumulate only as needed
+
+**Defaults**: No access. User grants explicitly.
+
+**Scope**: Each grant is scoped to:
+- Data type (calendar, todos, etc.)
+- Field set (titles, attendees, etc.)
+- Time window (this session, 24 hours, always)
+
+### Privacy Receipts + Undo
+
+After each remote call, show receipt of what was sent.
+
+**Receipt anatomy**:
+```
+Privacy Receipt #47
+─────────────────────
+Sent to: Claude API
+Purpose: Calendar reasoning
+Fields sent: [event types, time ranges]
+Fields NOT sent: [titles, attendees, locations]
+Timestamp: 2026-01-27 21:15:03
+─────────────────────
+```
+
+**Undo mechanism**: "Undo last 24h" revokes all permissions granted in that window.
+
+**Access**: `sympal receipts` shows recent receipts. `sympal receipts --detail` shows full payloads.
+
+### Consent Recipes
+
+Named preset policies for common use cases.
+
+| Recipe | What It Allows |
+|--------|---------------|
+| Calendar-only | Calendar metadata to cloud; no todos, no content |
+| Strict local | All queries route to Local LLM; no cloud |
+| Balanced | DSL + Ephemeral Slots for reasoning; Local for content |
+
+**Setup**: User selects recipe on first run. Can change anytime.
+
+**Escalation**: If query needs more than recipe allows, one-line prompt: "This needs [X]. Allow once?"
+
+### Time-Boxed Access (TTL)
+
+Every consent grant has a time-to-live.
+
+| TTL Option | Duration |
+|------------|----------|
+| This query only | Single use |
+| This session | Until CLI exits |
+| 1 hour | Auto-revoke after |
+| 24 hours | Auto-revoke after |
+| Always | Persists (can revoke manually) |
+
+**Default**: 24 hours. Prevents permission creep.
+
+**UI**: Countdown badge shows time remaining on active grants.
 
 ---
 
@@ -480,6 +648,20 @@ CREATE TABLE calendar_events (
 | Token rotation | Placeholder IDs reset daily | Cross-session tracking | Pattern analysis |
 | Query batching | Batch 2-5 queries when possible | Individual query attribution | Batch-level patterns |
 | Timing noise | 100-500ms random delay | Timing correlation | Content correlation |
+| Prompt template normalization | Fixed structures, not free-form | Prompt fingerprinting | — |
+| Length caps | Consistent padding/truncation | Length-based profiling | Content analysis |
+
+**Prompt Template Normalization**:
+- Use fixed prompt structures for each query type
+- Avoid free-form user text in prompts where possible
+- Consistent ordering of schema elements
+
+**Length Caps**:
+- Pad short queries to minimum length
+- Truncate long queries to maximum
+- Defeats length-based fingerprinting
+
+**Accepted limitation**: Nation-state actor with long-term observation may still correlate patterns. Practical obscurity, not perfect anonymity.
 
 ### Security Requirements
 
@@ -490,6 +672,89 @@ CREATE TABLE calendar_events (
 | Safe code execution | Deno sandbox, deny-by-default | P5 |
 | Audit trail | Query log shows what was sent | P12 |
 | User can inspect | `sympal log` shows recent queries | P4, P10 |
+
+### Defense-in-Depth Security Controls (V1)
+
+Multiple layers prevent data exposure even if one layer fails.
+
+#### Taint-Tracked Serialization
+
+Mark fields with sensitivity levels. Custom serializer checks tags before including fields.
+
+```go
+type CalendarEvent struct {
+    ID        string    `taint:"public"`
+    Title     string    `taint:"sensitive"`
+    StartTime time.Time `taint:"derived"`
+    Attendees []string  `taint:"sensitive"`
+}
+```
+
+| Taint Level | Behavior |
+|-------------|----------|
+| `public` | Always serializable |
+| `derived` | Serializable (computed from sensitive) |
+| `sensitive` | Requires policy grant |
+| `forbidden` | Never serializable |
+
+**Benefit**: Prevents accidental sensitive field inclusion in payloads.
+
+#### Policy-as-Code Gate
+
+Rules engine evaluates every outbound request before sending.
+
+```yaml
+# Example policy rules
+rules:
+  - name: no-raw-calendar-titles
+    match: { destination: "claude-api" }
+    deny: { fields: ["title", "attendees"] }
+
+  - name: require-ephemeral-slots
+    match: { tier: "reasoning" }
+    require: { transform: "ephemeral-slots" }
+```
+
+**Enforcement**: Denial = block + log + notify user. No silent bypass.
+
+#### Strict Egress Firewall
+
+Single exit point for all external requests.
+
+| Control | Implementation |
+|---------|----------------|
+| Endpoint whitelist | Only Claude API, Google APIs allowed |
+| Schema validation | Request shape must match registered schema |
+| Size limits | Token budget per request |
+| Rate limits | Prevent runaway queries |
+
+**Benefit**: Belt-and-suspenders with policy gate.
+
+#### Deterministic Redaction Layer
+
+Pattern-based PII removal as fail-safe before Ephemeral Slots.
+
+| Pattern | Example | Action |
+|---------|---------|--------|
+| Email addresses | `user@example.com` | Redact to `[EMAIL]` |
+| Phone numbers | `555-123-4567` | Redact to `[PHONE]` |
+| SSN patterns | `123-45-6789` | Redact to `[SSN]` |
+| Credit cards | `4111-1111-1111-1111` | Redact to `[CC]` |
+
+**Scope**: Narrow — catches obvious patterns NER might miss. Not replacement for Ephemeral Slots.
+
+#### Schema-Hash Gate
+
+Every allowed request schema hashed and registered in code.
+
+```go
+var allowedSchemas = map[string]bool{
+    "sha256:abc123...": true,  // DSL compilation request
+    "sha256:def456...": true,  // Ephemeral Slots request
+}
+```
+
+**Enforcement**: Unregistered schema = block. Forces code review for any payload change.
 
 ---
 
@@ -557,38 +822,63 @@ CREATE TABLE calendar_events (
 
 ### Phase 3: DSL Compilation (M3)
 
-- [ ] Query Classifier (keyword cascade)
+- [ ] Query Classifier (keyword cascade + hybrid detection)
 - [ ] Schema description generator
 - [ ] Claude API integration
-- [ ] SymQL code generation
-- [ ] Deno sandbox setup
+- [ ] SymQL lexer and parser
+- [ ] SymQL executor (Go interpreter)
+- [ ] Deno sandbox fallback
+- [ ] DSL hardening (golden-set testing, type guards)
+- [ ] Security controls (taint tracking, policy gate, egress firewall)
 - [ ] Code validation → execution pipeline
 - [ ] Test with todo + calendar queries
 
 **Gate**: >90% of structured queries return correct results; test suite includes 20 real-world queries with >80% expressible in SymQL
 
+**Security gate**: All security controls active and tested before M3 complete
+
 ### Phase 4: Ephemeral Slots (M4)
 
 - [ ] Entity extraction (NER)
-- [ ] Ephemeral placeholder generation
-- [ ] Legend construction (task-based defaults)
+- [ ] Ephemeral placeholder generation (single-use random IDs)
+- [ ] Legend construction (task-based defaults + escalation framework)
 - [ ] Projection function (real → placeholders)
-- [ ] Rehydration function (response → real)
+- [ ] Rehydration pipeline (5-step process)
+- [ ] Known failure case routing (follow-ups, reminders → Local)
+- [ ] User consent mechanisms (progressive consent, receipts)
 - [ ] Test with reasoning queries
 
 **NER Implementation Note**: Library choice to be determined during implementation. Options: Go-native (prose, go-ner) vs. subprocess to Python (spaCy). Prefer Go-native for single-binary goal unless accuracy gap is significant.
 
-**Gate**: >95% rehydration accuracy
+**NER Confidence by Data Type**:
+| Data Type | Required Accuracy | Notes |
+|-----------|-------------------|-------|
+| Calendar titles | >85% | Medium sensitivity |
+| Todos | >85% | Medium sensitivity |
+| Email (M5+) | >90% | High sensitivity — require per-query review if below |
+
+**Gate**: >95% rehydration accuracy; <30% legend escalation rate
 
 ### Phase 5: Local LLM + Integration (M5)
 
-- [ ] Ollama integration
+- [ ] Ollama integration (Llama 3.2 3B)
 - [ ] Content task routing
-- [ ] End-to-end privacy tier
-- [ ] Quality logging
+- [ ] Quality comparison logging (Local vs Claude baseline)
+- [ ] End-to-end privacy tier (all three tiers integrated)
+- [ ] Time-boxed access (TTL on permissions)
+- [ ] Privacy receipts
 - [ ] Daily use begins
 
+**Local LLM Quality Benchmarking**:
+Before M5 complete, benchmark Llama 3.2 3B on:
+- Summarization tasks (target: >70% quality vs Claude)
+- Classification tasks (target: >70% accuracy)
+
+If benchmarks fail, route fuzzy data-processing tasks to Ephemeral Slots (protected exposure) rather than Local LLM.
+
 **Gate**: Lead Dev uses daily AND ≥50% of LLM queries route through DSL or Ephemeral Slots (not Local-only fallback)
+
+**Quality gate**: Local LLM achieves >70% task success on summarization/classification benchmarks
 
 ### Dependency Graph
 
@@ -664,6 +954,26 @@ M5 (Local LLM + Integration)
 | UNCERTAIN fallback | <20% | >30% | Expand classifier keywords or add local LLM classifier |
 | Latency (simple) | <5s | >10s | Profile pipeline |
 
+### Consolidated Quality Gates
+
+All gates that must pass before milestone completion:
+
+| Milestone | Gate | Target | Failure Action |
+|-----------|------|--------|----------------|
+| **M3** | SymQL expressiveness | >80% of structured queries expressible | Expand grammar |
+| **M3** | DSL execution success | >90% | Debug compiler |
+| **M4** | Legend escalation rate | <30% | Re-evaluate task defaults |
+| **M4** | Rehydration accuracy | >95% | Review NER, simplify |
+| **M5** | NER accuracy (email) | >90% | Require per-query review for email |
+| **M5** | Local LLM quality | >70% task success (summarization/classification) | Route fuzzy tasks to Ephemeral Slots |
+| **M5** | Privacy tier coverage | ≥50% queries via DSL/Ephemeral Slots | Expand classifier, improve DSL |
+| **M5** | Dogfooding | Daily use with value | Diagnose friction points |
+
+**Measurement timing**:
+- M3 gates: Measured with 20-query test suite
+- M4 gates: Measured over 100 reasoning queries
+- M5 gates: Measured over 2-week dogfooding period
+
 ### Dogfooding Validity
 
 Monthly reflection: "Would I use this if I hadn't built it?"
@@ -717,6 +1027,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0-draft | 2026-01-27 | **Full sync with privacy-innovations.md v3.0.0**: Added DSL hardening (golden-set, type guards); Hybrid decomposition state machine; Security controls (taint tracking, policy gate, egress firewall, deterministic redaction, schema-hash gate); UX controls (progressive consent, privacy receipts, consent recipes, time-boxed access); Legend escalation framework; Ephemeral Slots known failure cases; Rehydration pipeline; M5 local LLM benchmarking; Consolidated quality gates; Expanded correlation mitigations. **Pending team + Vero review.** |
 | 1.1.0 | 2026-01-27 | Synced M3 spec with privacy-innovations.md v3.0.0: (1) Execution architecture — Go interpreter primary, Deno fallback; (2) SymQL grammar expanded (FILTER/JOIN/SCORE/AGGREGATE/WINDOW/RETURN); (3) Query Classifier spec expanded with 5 categories and hybrid decomposition. |
 | 1.0.3 | 2026-01-19 | Vero review fixes (all MINOR): (1) Fixed diagram — Calendar* with note for R+Create only; (2) Added OAuth implementation note (prefer on-demand refresh); (3) Added NER implementation note (prefer Go-native unless accuracy gap). Status → Final. |
 | 1.0.2 | 2026-01-19 | Adversary challenge fixes: (1) Added UNCERTAIN fallback rate metric (<20%) with circuit breaker; (2) Added rehydration failure categories with "wrong placeholder" mitigation; (3) Fixed correlation claim to include behavioral pattern caveat; (4) Made M5 gate objective (≥50% queries via DSL/Ephemeral Slots); (5) Documented SymQL intentional limitations, added expressiveness test to M3; (6) Specified calendar write controls (create only, confirmation required, no attendees). |
