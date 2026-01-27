@@ -1,8 +1,8 @@
 # SymPAL Technical Design Document
 
-**Version:** 1.0.3
-**Date:** 2026-01-19
-**Status:** Final (Vero review passed)
+**Version:** 1.1.0
+**Date:** 2026-01-27
+**Status:** Active (M3 spec synced with privacy-innovations.md)
 **Author:** Kael + Ryn (synthesis from Lead Dev interview + delta)
 **PRD Reference:** foundations/prd.md (v1.0.0)
 **Privacy Reference:** foundations/privacy-innovations.md (v3.0.0)
@@ -153,47 +153,66 @@ Legend: DSL = DSL Compilation, E.S = Ephemeral Slots, Local = Local LLM
 
 The Query Classifier is a deterministic keyword cascade that routes queries to the appropriate privacy tier. Zero latency, fully debuggable.
 
+### Classification Categories
+
+| Category | Route To | Exposure | Trigger Keywords |
+|----------|----------|----------|------------------|
+| STRUCTURED | DSL Compilation | Zero | "how many", "count", "list", "filter", "search", "find all", "show me", "when is" |
+| HYBRID | DSL → Ephemeral Slots | Zero → Protected | Structured keyword + content/reasoning verb |
+| REASONING | Ephemeral Slots | Protected | "should I", "prioritize", "advise", "recommend", "help me decide", "what's important" |
+| CONTENT | Local LLM | Zero | "draft", "write", "compose", "summarize", "rewrite", "edit" |
+| UNCERTAIN | Local LLM (default) | Zero | No confident match |
+
 ### Classification Algorithm
+
+**Order of operations** (privacy-first — check zero-exposure paths first):
 
 ```
 CLASSIFY(query):
-    1. CHECK STRUCTURED PATTERNS (→ DSL Compilation)
-       Keywords: "how many", "count", "list", "filter", "search", "find all"
+    1. CHECK STRUCTURED PATTERNS (→ DSL Compilation, zero exposure)
+       Keywords: "how many", "count", "list", "filter", "search", "find all", "show me", "when is"
        Confidence: HIGH if keyword match + no content verbs
 
     2. CHECK HYBRID PATTERNS (→ DSL then Ephemeral Slots)
-       Detection: Structured keyword + reasoning verb ("prioritize the meetings")
-       Process: Execute DSL first, pass results to Ephemeral Slots
+       Detection: Structured keyword + reasoning/content verb
+       Example: "Prioritize my meetings today" → filter first, then reason
+       Process: Execute DSL, pass filtered results to Ephemeral Slots
 
-    3. CHECK REASONING PATTERNS (→ Ephemeral Slots)
-       Keywords: "should I", "prioritize", "advise", "recommend", "what's important"
+    3. CHECK REASONING PATTERNS (→ Ephemeral Slots, protected exposure)
+       Keywords: "should I", "prioritize", "advise", "recommend", "help me decide"
        Confidence: HIGH if reasoning keyword present
 
-    4. CHECK CONTENT PATTERNS (→ Local LLM)
+    4. CHECK CONTENT PATTERNS (→ Local LLM, zero exposure)
        Keywords: "draft", "write", "compose", "summarize", "rewrite"
        Confidence: HIGH if content verb present
 
     5. DEFAULT (→ Local LLM with quality warning)
        Log: "Uncertain classification, defaulting to most private"
+       Always safe fallback — never expose data on uncertainty
 ```
-
-### Classification Categories
-
-| Category | Route To | Example Queries |
-|----------|----------|-----------------|
-| STRUCTURED | DSL Compilation | "How many meetings this week?", "List high-priority todos" |
-| HYBRID | DSL → Ephemeral Slots | "Prioritize my meetings today" (filter then reason) |
-| REASONING | Ephemeral Slots | "Should I reschedule?", "What should I focus on?" |
-| CONTENT | Local LLM | "Draft a meeting agenda", "Summarize this" |
-| UNCERTAIN | Local LLM (default) | Ambiguous queries |
 
 ### Confidence Thresholds
 
 | Confidence | Behavior |
 |------------|----------|
-| HIGH (keyword match) | Route directly |
-| MEDIUM (partial match) | Route with logging |
-| LOW (no match) | Default to Local LLM |
+| HIGH (strong keyword match) | Route directly |
+| MEDIUM (partial match) | Route with logging for review |
+| LOW (no match) | Default to Local LLM (safest) |
+
+### Hybrid Query Decomposition
+
+Some queries combine structured operations with reasoning/content. Decompose them:
+
+**Example**: "Summarize my urgent emails about Project Titan"
+
+Without decomposition: Routes to Local LLM (content task), all data exposed locally.
+
+With decomposition:
+1. DSL extracts: `FILTER emails WHERE priority = 'urgent' AND subject CONTAINS 'Project Titan'`
+2. Returns 3 emails (filtered from 500)
+3. Only those 3 sent to Local LLM for summarization
+
+**Benefit**: Minimizes data processed even within zero-exposure tiers.
 
 ---
 
@@ -204,32 +223,26 @@ CLASSIFY(query):
 **How it works**:
 1. Query + schema description sent to Claude (no data)
 2. Claude generates SymQL code
-3. Code validated and executed in Deno sandbox
-4. Results returned to user
+3. Code validated by parser
+4. Executed by local Go interpreter (primary) or Deno sandbox (fallback)
+5. Results returned to user
 
-**SymQL Grammar** (subset):
+#### Execution Architecture
 
-```
-query       := SELECT fields FROM source [WHERE conditions] [ORDER BY field] [LIMIT n]
-fields      := "*" | field ("," field)*
-source      := "todos" | "calendar" | "entities"
-conditions  := condition (("AND" | "OR") condition)*
-condition   := field operator value
-operator    := "=" | "!=" | ">" | "<" | ">=" | "<=" | "CONTAINS" | "IN"
-```
+**Primary: Go Interpreter (~95% of queries)**
 
-**Intentional Limitations** (V1):
-- No JOIN (cross-table queries route to Ephemeral Slots)
-- No GROUP BY (aggregation by category routes to Ephemeral Slots)
-- No subqueries (complex filters route to Ephemeral Slots)
+LLM generates constrained SymQL. Executed by local Go interpreter — no sandbox needed.
 
-These limitations are acceptable for V1. If >30% of "structured-looking" queries can't be expressed in SymQL, expand grammar in V1.5.
+Why DSL over full code generation:
+- 99.9% parse success vs 60-90% for general code (Anka DSL study)
+- Eliminates code injection entirely (no arbitrary execution)
+- No package hallucination (no imports exist)
+- Easier to audit and validate
+- Interpreter runs in-process — no subprocess, no IPC overhead
 
-**Example**:
-- Input: "How many meetings do I have next week?"
-- Generated: `SELECT COUNT(*) FROM calendar WHERE start_date >= '2026-01-20' AND start_date < '2026-01-27' AND type = 'meeting'`
+**Fallback: Deno Sandbox (<5% of queries)**
 
-**Sandbox Specification** (Deno):
+For queries exceeding SymQL expressiveness:
 
 ```bash
 deno run --no-prompt --no-npm --no-remote [script.ts]
@@ -242,7 +255,47 @@ deno run --no-prompt --no-npm --no-remote [script.ts]
 | `--no-npm` | Disallow npm package imports |
 | `--no-remote` | Disallow fetching remote modules |
 
-Data passed via stdin/stdout. 5-second timeout enforced by Go.
+Data passed via stdin (JSON), results via stdout. 5-second timeout enforced by Go context.
+
+#### SymQL Grammar
+
+```
+FILTER <table>
+  WHERE <conditions>
+JOIN <table2> ON <condition>
+SCORE BY <field> [ASC|DESC]
+AGGREGATE <function>(<field>)
+WINDOW <date_range>
+LIMIT <n>
+RETURN <table|fields>
+```
+
+**Supported Operations**:
+- `FILTER` — Select from table with WHERE conditions
+- `JOIN` — Combine tables on field relationships
+- `SCORE` — Rank results by fields (ASC/DESC)
+- `AGGREGATE` — COUNT, SUM, AVG, MIN, MAX
+- `WINDOW` — Date ranges (@today, @this_week, @next_week, @last_30_days)
+- `LIMIT` — Cap result count
+- `RETURN` — Specify output table/fields
+
+**Comparison Operators**: =, !=, >, <, >=, <=, CONTAINS, IN
+
+**Example**:
+```
+FILTER calendar_events
+  WHERE start >= @this_week_start
+    AND start <= @this_week_end
+AGGREGATE COUNT(*)
+RETURN result
+```
+
+**V1 Intentional Limitations**:
+- No nested subqueries
+- Simple JOINs only (single level)
+- No complex GROUP BY
+
+If >30% of "structured-looking" queries can't be expressed, expand grammar in V1.5.
 
 ### Tier 2: Ephemeral Slots (Pattern-Only Exposure)
 
@@ -664,6 +717,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-01-27 | Synced M3 spec with privacy-innovations.md v3.0.0: (1) Execution architecture — Go interpreter primary, Deno fallback; (2) SymQL grammar expanded (FILTER/JOIN/SCORE/AGGREGATE/WINDOW/RETURN); (3) Query Classifier spec expanded with 5 categories and hybrid decomposition. |
 | 1.0.3 | 2026-01-19 | Vero review fixes (all MINOR): (1) Fixed diagram — Calendar* with note for R+Create only; (2) Added OAuth implementation note (prefer on-demand refresh); (3) Added NER implementation note (prefer Go-native unless accuracy gap). Status → Final. |
 | 1.0.2 | 2026-01-19 | Adversary challenge fixes: (1) Added UNCERTAIN fallback rate metric (<20%) with circuit breaker; (2) Added rehydration failure categories with "wrong placeholder" mitigation; (3) Fixed correlation claim to include behavioral pattern caveat; (4) Made M5 gate objective (≥50% queries via DSL/Ephemeral Slots); (5) Documented SymQL intentional limitations, added expressiveness test to M3; (6) Specified calendar write controls (create only, confirmation required, no attendees). |
 | 1.0.1 | 2026-01-19 | Vale checkpoint fixes: (1) Added `sympal log` command to M1 for P10 user control; (2) Clarified Cloud LLM decision — V1 hardcodes Claude, abstraction layer is V2 scope (P3 deferred). |
