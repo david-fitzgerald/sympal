@@ -1,8 +1,8 @@
 # SymPAL Technical Design Document
 
-**Version:** 1.2.0-draft
+**Version:** 1.2.0
 **Date:** 2026-01-27
-**Status:** Draft (full sync with privacy-innovations.md — pending team + Vero review)
+**Status:** Final (team + Vero reviewed; all findings addressed)
 **Author:** Kael + Ryn (synthesis from Lead Dev interview + delta)
 **PRD Reference:** foundations/prd.md (v1.0.0)
 **Privacy Reference:** foundations/privacy-innovations.md (v3.0.0)
@@ -64,7 +64,7 @@
 | Plugin architecture | Modular monolith; plugins are V2+ |
 | Mobile/web interface | CLI only for V1 |
 | Multi-user support | Single user dogfooding |
-| Email/Contacts integration | Deferred until privacy proven with Calendar |
+| Contacts integration | Deferred until privacy proven with Calendar + Email |
 
 ### V1 Coverage
 
@@ -106,9 +106,9 @@ With PaaP deferred, V1 achieves:
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐
 │  Integrations   │ │   Capabilities  │ │      Privacy Tier       │
 │  - Calendar*    │ │   - Todo CRUD   │ │  ┌─────────────────┐    │
-│                 │ │   - Day Planner │ │  │ Query Classifier│    │
-│  (Gmail, Cont-  │ │                 │ │  │ (keyword cascade)│   │
-│   acts = V1.5+) │ │                 │ │  └────────┬────────┘    │
+│  - Gmail**      │ │   - Day Planner │ │  │ Query Classifier│    │
+│  (Contacts V2+) │ │                 │ │  │ (keyword cascade)│   │
+│                 │ │                 │ │  └────────┬────────┘    │
 └─────────────────┘ └─────────────────┘ │           │             │
         │                   │           │     ┌─────┴─────┐       │
         │                   │           │     ▼     ▼     ▼       │
@@ -121,7 +121,7 @@ With PaaP deferred, V1 achieves:
 │                     Data Layer (SQLite)                         │
 │  ~/.sympal/data.db                                              │
 │  - entities, relationships (knowledge graph)                    │
-│  - todos, cached calendar                                       │
+│  - todos, cached calendar, cached email (M5)                    │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -133,6 +133,7 @@ With PaaP deferred, V1 achieves:
 
 Legend: DSL = DSL Compilation, E.S = Ephemeral Slots, Local = Local LLM
         * = Read + Create only (see Calendar Write Controls)
+        ** = Read only; requires NER >90% accuracy gate (see M5)
 ```
 
 ### Component Summary
@@ -385,12 +386,12 @@ Reduces prompt sensitivity and improves cache hit rates.
 - Track escalation frequency — if >30% of queries escalate, re-evaluate defaults
 - Escalation is per-task, not per-entity (same entity can have different legend detail for different tasks)
 
-**Leakage warning**: Over-escalation defeats privacy. Detailed legends can identify entities without names.
+**Leakage warning**: Over-escalation defeats privacy. Detailed legends can identify entities without names. Even slotted descriptions like "direct manager at my current employer, strained relationship" may be as identifying as a real name in a small organization. **This is a navigated tension, not a solved problem** — minimize legend detail aggressively.
 
-**NER Confidence Handling**:
-- HIGH (>0.8): Auto-accept
-- MEDIUM (0.5-0.8): Accept, log for review
-- LOW (<0.5): Skip review for known entities; prompt for truly new entities
+**NER Confidence Handling** (measured by F1 score on held-out test set):
+- HIGH (F1 >0.8): Auto-accept extraction
+- MEDIUM (F1 0.5-0.8): Accept, log for review
+- LOW (F1 <0.5): Skip review for known entities; prompt for truly new entities
 
 **Rehydration Requirements**:
 - LLM response must use exact placeholder format: `[E1]`, `[E2]`
@@ -402,7 +403,7 @@ Reduces prompt sensitivity and improves cache hit rates.
 | Category | Example | Detectable? | Severity |
 |----------|---------|-------------|----------|
 | Missing placeholder | LLM says "your colleague" instead of `[E1]` | Yes (regex) | Low — shows anonymized |
-| Wrong placeholder | `[E1]` used where `[E2]` meant | Partial | High — wrong advice looks correct |
+| Wrong placeholder | `[E1]` used where `[E2]` meant | Partial (heuristics only) | High — wrong advice looks correct |
 | Self-reference | `[E1] should meet with [E1]` | Yes (duplicate check) | Medium |
 | Format corruption | `[E 1]` or `E1` | Yes (regex) | Low |
 
@@ -562,6 +563,7 @@ Every consent grant has a time-to-live.
 |-----------|-------------|---------|----------------|
 | Todos | Low | SQLite | Via Ephemeral Slots only |
 | Calendar events | Medium | SQLite (cached) | Via Ephemeral Slots only |
+| Email (M5) | High | SQLite (cached) | Via Ephemeral Slots only; requires NER >90% gate |
 | Knowledge graph | Medium | SQLite | Never |
 | OAuth tokens | Critical | System keychain | Never |
 | Query logs | Medium | Log file | Never |
@@ -610,6 +612,19 @@ CREATE TABLE calendar_events (
     metadata TEXT,
     synced_at TIMESTAMP
 );
+
+-- Email (M5)
+CREATE TABLE emails (
+    id TEXT PRIMARY KEY,
+    subject TEXT NOT NULL,
+    sender TEXT,               -- Entity ID if resolved
+    recipients TEXT,           -- JSON array of entity IDs
+    body_preview TEXT,         -- First 500 chars for display
+    received_at TIMESTAMP,
+    is_actionable BOOLEAN,     -- Detected by classifier
+    metadata TEXT,
+    synced_at TIMESTAMP
+);
 ```
 
 ### Data Ownership (P11 Reversibility)
@@ -627,7 +642,7 @@ CREATE TABLE calendar_events (
 ### Threat Model
 
 **Assets to protect**:
-- Personal data (calendar, todos, entities)
+- Personal data (calendar, todos, email, entities)
 - Query patterns (what user asks about)
 - Identity (who the user is)
 
@@ -760,20 +775,23 @@ var allowedSchemas = map[string]bool{
 
 ## Explicitly Accepted Risks
 
-### Risk 1: NER is the Achilles' Heel (CRITICAL)
+### Risk 1: NER is the Achilles' Heel (CRITICAL — Privacy Failure Mode)
 
-**The risk**: If NER misses an entity, real data goes to cloud LLM.
+**The risk**: If NER misses an entity, real data goes to cloud LLM. **This is not a quality issue — it is a privacy failure.**
 
-**Why we accept it**:
-- No perfect NER exists
-- User review catches misses for new entities
-- Known entities auto-recognized (skip review)
-- Alternative (no cloud) sacrifices too much quality
+**Why we accept it** (with significant uncertainty):
+- No perfect NER exists — this is a fundamental limitation
+- User review *may* catch misses for new entities — **this is an untested hypothesis**
+- Known entities auto-recognized (skip review) — reduces friction but may miss context-dependent references
+- Alternative (no cloud) sacrifices too much quality for dogfooding value
 
-**Mitigations**:
-- Conservative extraction (prefer false positives)
-- User confirmation for new/uncertain entities
-- Audit log for post-hoc review
+**Mitigations** (effectiveness uncertain until validated):
+- Conservative extraction (prefer false positives) — **feasibility depends on library choice**
+- User confirmation for new/uncertain entities — **adds friction; user compliance unknown**
+- Audit log for post-hoc review — catches issues after the fact, not before
+- **Privacy fallback**: If NER confidence is LOW for a query, route entire query to Local LLM rather than risk exposure
+
+**What would change this assessment**: If dogfooding reveals >5% undetected entity leakage, escalate to per-query review or restrict to Local LLM for high-sensitivity data.
 
 ### Risk 2: Legend Leakage if Escalation Always Required
 
@@ -793,27 +811,29 @@ var allowedSchemas = map[string]bool{
 
 ## Implementation Plan
 
-### Phase 1: Foundation (M1)
+### Phase 1: Foundation (M1) ✅ Complete
 
-- [ ] Go project scaffolding (Cobra CLI, config loading)
-- [ ] SQLite setup with schema
-- [ ] Basic todo CRUD (`sympal todo add/list/done/delete`)
-- [ ] Config file handling (`~/.sympal/config.yaml`)
-- [ ] Logging infrastructure (`~/.sympal/sympal.log`)
-- [ ] `sympal log` command (view recent queries, supports P10 user control)
+- [x] Go project scaffolding (Cobra CLI, config loading)
+- [x] SQLite setup with schema
+- [x] Basic todo CRUD (`sympal todo add/list/done/delete`)
+- [x] Config file handling (`~/.sympal/config.yaml`)
+- [x] Logging infrastructure (`~/.sympal/sympal.log`)
+- [x] `sympal log` command (view recent queries, supports P10 user control)
 
-**Gate**: Todo CRUD works end-to-end
+**Gate**: ✅ Todo CRUD works end-to-end
 
-### Phase 2: Calendar Integration (M2)
+### Phase 2: Calendar Integration (M2) ✅ Complete
 
-- [ ] Google OAuth flow (system keychain storage)
-- [ ] Calendar API integration (read events)
-- [ ] `sympal today` command (todos + calendar)
-- [ ] Basic day view (no LLM yet)
+- [x] Google OAuth flow (system keychain storage)
+- [x] Calendar API integration (read events)
+- [x] `sympal today` command (todos + calendar)
+- [x] Basic day view (no LLM yet)
+- [x] Token refresh on 401 (on-demand refresh)
+- [x] HTTP status code checking before JSON parsing
 
-**Gate**: Can view today's calendar and todos together
+**Gate**: ✅ Can view today's calendar and todos together
 
-**OAuth Implementation Note**: Token refresh strategy (background vs. on-demand) to be determined during implementation. Both are well-documented patterns; prefer on-demand for simplicity in V1.
+**OAuth Implementation Note**: Token refresh implemented as on-demand (refresh on 401). Token expiry tracking deferred — system relies on refresh token validity rather than proactive expiry management.
 
 **Calendar Write Controls** (V1):
 - **Supported**: Create events only (no modify, no delete in V1)
@@ -822,12 +842,13 @@ var allowedSchemas = map[string]bool{
 
 ### Phase 3: DSL Compilation (M3)
 
+- [ ] Knowledge graph schema and basic CRUD (entities, relationships tables)
 - [ ] Query Classifier (keyword cascade + hybrid detection)
 - [ ] Schema description generator
 - [ ] Claude API integration
 - [ ] SymQL lexer and parser
 - [ ] SymQL executor (Go interpreter)
-- [ ] Deno sandbox fallback
+- [ ] Deno sandbox fallback (security validation required before use)
 - [ ] DSL hardening (golden-set testing, type guards)
 - [ ] Security controls (taint tracking, policy gate, egress firewall)
 - [ ] Code validation → execution pipeline
@@ -835,7 +856,7 @@ var allowedSchemas = map[string]bool{
 
 **Gate**: >90% of structured queries return correct results; test suite includes 20 real-world queries with >80% expressible in SymQL
 
-**Security gate**: All security controls active and tested before M3 complete
+**Security gate**: All security controls active. Deno sandbox must pass isolation tests (no network, no filesystem) before fallback is enabled.
 
 ### Phase 4: Ephemeral Slots (M4)
 
@@ -850,6 +871,12 @@ var allowedSchemas = map[string]bool{
 
 **NER Implementation Note**: Library choice to be determined during implementation. Options: Go-native (prose, go-ner) vs. subprocess to Python (spaCy). Prefer Go-native for single-binary goal unless accuracy gap is significant.
 
+**NER Library Selection Criteria** (must pass before M4 complete):
+- Minimum F1 score >0.80 on standard NER benchmark (CoNLL-2003 or OntoNotes)
+- Must handle common entity types: PERSON, ORG, PROJECT (custom training may be needed for PROJECT)
+- False negative rate <10% on calendar/todo test set (false negatives = privacy failures)
+- If no library meets criteria, escalate to per-query user review for all Ephemeral Slots routes
+
 **NER Confidence by Data Type**:
 | Data Type | Required Accuracy | Notes |
 |-----------|-------------------|-------|
@@ -859,7 +886,7 @@ var allowedSchemas = map[string]bool{
 
 **Gate**: >95% rehydration accuracy; <30% legend escalation rate
 
-### Phase 5: Local LLM + Integration (M5)
+### Phase 5: Local LLM + Email Integration (M5)
 
 - [ ] Ollama integration (Llama 3.2 3B)
 - [ ] Content task routing
@@ -867,6 +894,8 @@ var allowedSchemas = map[string]bool{
 - [ ] End-to-end privacy tier (all three tiers integrated)
 - [ ] Time-boxed access (TTL on permissions)
 - [ ] Privacy receipts
+- [ ] Gmail integration (read-only; OAuth scope expansion)
+- [ ] Email-to-todo detection (actionable email identification)
 - [ ] Daily use begins
 
 **Local LLM Quality Benchmarking**:
@@ -876,9 +905,16 @@ Before M5 complete, benchmark Llama 3.2 3B on:
 
 If benchmarks fail, route fuzzy data-processing tasks to Ephemeral Slots (protected exposure) rather than Local LLM.
 
+**Email Integration Requirements**:
+- NER accuracy on email content must be >90% F1 before email integration is enabled
+- If NER accuracy <90%, require per-query entity review for email routes
+- Email-to-todo detection is P1 (nice-to-have); manual email queries are P0
+
 **Gate**: Lead Dev uses daily AND ≥50% of LLM queries route through DSL or Ephemeral Slots (not Local-only fallback)
 
 **Quality gate**: Local LLM achieves >70% task success on summarization/classification benchmarks
+
+**Email gate**: NER achieves >90% F1 on email test set before email integration enabled
 
 ### Dependency Graph
 
@@ -895,7 +931,7 @@ M3 (DSL Compilation)
 M4 (Ephemeral Slots)
     │
     ▼
-M5 (Local LLM + Integration)
+M5 (Local LLM + Email Integration)
 ```
 
 ---
@@ -930,7 +966,11 @@ M5 (Local LLM + Integration)
 
 ### Primary Metric (P17 Dogfooding)
 
-**Lead Dev uses SymPAL daily** — measured by `sympal today` run each morning.
+**Lead Dev uses SymPAL daily** — measured by:
+1. `sympal today` run each morning (instrumented; logged to `~/.sympal/usage.log`)
+2. Weekly reflection: "Did SymPAL provide value this week beyond what I'd get from direct Claude/calendar?"
+
+**Success definition**: Daily use sustained for 2+ weeks with positive weekly reflections. If use drops or reflections turn negative, diagnose friction points before declaring M5 complete.
 
 ### Technical Metrics
 
@@ -964,10 +1004,11 @@ All gates that must pass before milestone completion:
 | **M3** | DSL execution success | >90% | Debug compiler |
 | **M4** | Legend escalation rate | <30% | Re-evaluate task defaults |
 | **M4** | Rehydration accuracy | >95% | Review NER, simplify |
-| **M5** | NER accuracy (email) | >90% | Require per-query review for email |
+| **M5** | NER accuracy (email) | >90% F1 | Require per-query review for email |
 | **M5** | Local LLM quality | >70% task success (summarization/classification) | Route fuzzy tasks to Ephemeral Slots |
 | **M5** | Privacy tier coverage | ≥50% queries via DSL/Ephemeral Slots | Expand classifier, improve DSL |
-| **M5** | Dogfooding | Daily use with value | Diagnose friction points |
+| **M5** | Dogfooding | Daily use with value (2+ weeks sustained) | Diagnose friction points |
+| **M5** | Email integration | Gmail read working with NER gate passed | Defer email if NER <90% |
 
 **Measurement timing**:
 - M3 gates: Measured with 20-query test suite
@@ -1020,6 +1061,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 | Llama 3.2 3B | llama3.2:3b |
 | SQLite | 3.x |
 | Google Calendar API | v3 |
+| Gmail API | v1 |
 
 ---
 
@@ -1027,6 +1069,7 @@ If answer is "no" — diagnose what's not working. Daily use from commitment ≠
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-01-27 | **Team + Vero review complete.** Fixes: (1) Added Gmail integration to M5, aligning with PRD P0; (2) Added knowledge graph to M3 deliverables; (3) Added NER library selection criteria with F1 benchmarks; (4) Reframed NER risk as privacy failure with uncertainty markers; (5) Strengthened legend leakage warning; (6) Clarified rehydration "wrong placeholder" as partial detection; (7) Added Deno sandbox security validation requirement; (8) Clarified success metric with measurement approach; (9) Marked M1/M2 as complete; (10) Specified NER confidence metric as F1; (11) Updated OAuth note with token expiry approach. |
 | 1.2.0-draft | 2026-01-27 | **Full sync with privacy-innovations.md v3.0.0**: Added DSL hardening (golden-set, type guards); Hybrid decomposition state machine; Security controls (taint tracking, policy gate, egress firewall, deterministic redaction, schema-hash gate); UX controls (progressive consent, privacy receipts, consent recipes, time-boxed access); Legend escalation framework; Ephemeral Slots known failure cases; Rehydration pipeline; M5 local LLM benchmarking; Consolidated quality gates; Expanded correlation mitigations. **Pending team + Vero review.** |
 | 1.1.0 | 2026-01-27 | Synced M3 spec with privacy-innovations.md v3.0.0: (1) Execution architecture — Go interpreter primary, Deno fallback; (2) SymQL grammar expanded (FILTER/JOIN/SCORE/AGGREGATE/WINDOW/RETURN); (3) Query Classifier spec expanded with 5 categories and hybrid decomposition. |
 | 1.0.3 | 2026-01-19 | Vero review fixes (all MINOR): (1) Fixed diagram — Calendar* with note for R+Create only; (2) Added OAuth implementation note (prefer on-demand refresh); (3) Added NER implementation note (prefer Go-native unless accuracy gap). Status → Final. |
