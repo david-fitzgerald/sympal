@@ -18,30 +18,21 @@
 
 ## Current Status
 
-**Phase:** M2 Calendar Integration
-**Progress:** ✅ Complete (2026-01-26)
+**Phase:** M3 DSL Compilation
+**Progress:** Planning
 
 **M1 Foundation:** ✅ Complete (2026-01-21)
+**M2 Calendar:** ✅ Complete + Polished (2026-01-27)
 
-### M2 Progress Detail
+### M2 Polish (Complete)
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| `internal/keyring/` | ✅ Complete | Token save/load via system keychain |
-| `internal/config/` | ✅ Complete | GoogleConfig struct added |
-| `internal/auth/google.go` | ✅ Complete | Full OAuth flow with token exchange |
-| `internal/calendar/` | ✅ Complete | Google Calendar API client |
-| `sympal auth` command | ✅ Complete | Triggers OAuth flow |
-| `sympal today` command | ✅ Complete | Displays today's calendar events |
+- ✅ Todos in `sympal today` output
+- ✅ Token refresh on 401 (no more re-auth every hour)
+- ✅ HTTP status code checking before parsing
 
-### Resume Point (2026-01-26)
+### Resume Point (2026-01-27)
 
-**M2 complete.** Next session: M3 planning or M2 polish.
-
-Possible M2 polish:
-- Add todos to `sympal today` output
-- Handle token refresh (currently requires re-auth after ~1hr)
-- Add HTTP status code checking before parsing response
+**M3 planning.** Ready to start DSL Compilation milestone.
 
 Auth flow steps (all complete):
 1. ✅ Secure state generation (crypto/rand)
@@ -145,41 +136,83 @@ Use personas for M3+ (sandboxing, OAuth, LLM integration):
 
 ---
 
-### M2: Calendar Integration (Current)
+### M2: Calendar Integration ✅
+
+**Status:** Complete + Polished (2026-01-27)
 
 **Deliverables:**
-- [ ] Google OAuth flow (system keychain storage)
-- [ ] Calendar API integration (read events)
-- [ ] `sympal today` command (todos + calendar)
-- [ ] Basic day view (no LLM yet)
+- [x] Google OAuth flow (system keychain storage)
+- [x] Calendar API integration (read events)
+- [x] `sympal today` command (todos + calendar)
+- [x] Basic day view (no LLM yet)
+- [x] Token refresh on 401
+- [x] HTTP status code checking
 
-**Gate:** Can view today's calendar and todos together
+**Gate:** ✅ Can view today's calendar and todos together
 
-**Learning focus:**
+**Learning outcomes:**
 - OAuth flow (reusable for any Google/OAuth API)
 - API integration patterns
 - Token management (refresh, storage)
-- Graceful degradation
+- HTTP client error handling
 
 ---
 
 ### M3: DSL Compilation
 
 **Deliverables:**
-- [ ] Query Classifier (keyword cascade)
+- [ ] Query Classifier (keyword cascade routing)
 - [ ] Schema description generator
 - [ ] Claude API integration
-- [ ] SymQL code generation
-- [ ] Deno sandbox setup
-- [ ] Code validation and execution pipeline
+- [ ] SymQL lexer and parser
+- [ ] SymQL executor (Go interpreter)
+- [ ] Deno sandbox fallback (<5% of queries)
+- [ ] Code validation pipeline
+- [ ] `sympal query "..."` command
+- [ ] Security controls (taint tracking, egress firewall)
 
-**Gate:** >90% structured queries return correct results
+**Gate:** >90% structured queries return correct results; 20 test queries with >80% expressible in SymQL
+
+**Implementation Chunks:**
+
+| Chunk | Component | Mode | Notes |
+|-------|-----------|------|-------|
+| 1 | Query Classifier | Teach | Foundation for routing; keyword patterns + confidence |
+| 2 | Claude API Client | Ship | Standard HTTP; add API key to config |
+| 3 | Schema Generator | Teach | Describe tables without exposing data |
+| 4 | SymQL Lexer | Teach | Tokenize SymQL; reusable parsing skill |
+| 5 | SymQL Parser | Teach | Tokens → AST; valuable skill |
+| 6 | SymQL Executor | Teach | Execute AST against SQLite |
+| 7 | Deno Sandbox | Deep dive | Security-critical; understand attack vectors |
+| 8 | Validation Pipeline | Teach | Parse → validate → execute flow |
+| 9 | Security Controls | Deep dive | Taint tracking, egress firewall |
+| 10 | Integration + CLI | Ship | Wire together, add `sympal query` command |
 
 **Learning focus:**
-- Code generation patterns
-- Sandboxing (security-critical — go deep)
-- LLM API integration
+- Parser construction (lexer → parser → AST → executor)
+- Sandboxing and security (Deno deny-by-default)
+- LLM API integration and prompt engineering
 - Compile-don't-interpret pattern
+
+**Security-critical (go deep):**
+- Deno sandbox isolation
+- Taint-tracked serialization
+- Egress firewall (single exit point)
+
+**Files to create:**
+```
+internal/
+├── privacy/
+│   ├── classifier/     # Query routing
+│   ├── schema/         # Schema description generator
+│   ├── symql/          # Lexer, parser, executor
+│   ├── sandbox/        # Deno fallback
+│   └── validation/     # Code validation pipeline
+├── llm/
+│   └── claude/         # Claude API client
+cmd/sympal/
+└── query.go            # sympal query command
+```
 
 ---
 
@@ -268,3 +301,4 @@ See [ROADMAP.md](/ROADMAP.md#dogfood-feedback) — single source of truth for fr
 | 0.2.0 | 2026-01-21 | M1 complete, added Milestone Wrap-Up Procedure |
 | 0.3.0 | 2026-01-24 | M2 in progress (~30%): keyring + config complete, auth skeleton |
 | 0.4.0 | 2026-01-26 | M2 complete: OAuth flow, calendar API, `sympal auth`, `sympal today` |
+| 0.5.0 | 2026-01-27 | M2 polished (token refresh, todos in today). M3 plan detailed with 10 implementation chunks. Synced with privacy-innovations.md. |
