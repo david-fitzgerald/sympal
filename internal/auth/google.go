@@ -54,6 +54,27 @@ func exchangeToken(code, clientID, clientSecret string) (*tokenResponse, error) 
 	return &token, nil
 }
 
+func NewToken(refreshtoken, clientID, clientSecret string) (*tokenResponse, error) {
+	resp, err := http.PostForm(tokenURL, url.Values{"grant_type": {"refresh_token"}, "refresh_token": {refreshtoken}, "client_id": {clientID}, "client_secret": {clientSecret}})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var token tokenResponse
+	err = json.Unmarshal(body, &token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
+}
+
 func Authenticate(clientID, clientSecret string) (*tokenResponse, error) {
 	state, err := generateState()
 	if err != nil {

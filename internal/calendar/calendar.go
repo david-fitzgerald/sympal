@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/david-fitzgerald/sympal/internal/auth"
+	"github.com/david-fitzgerald/sympal/internal/config"
 	"github.com/david-fitzgerald/sympal/internal/keyring"
 )
 
@@ -35,7 +37,7 @@ type eventTime struct {
 
 func GetTodayEvents() ([]Event, error) {
 	// Load token
-	accesstoken, _, err := keyring.LoadTokens()
+	accesstoken, refreshtoken, err := keyring.LoadTokens()
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +61,30 @@ func GetTodayEvents() ([]Event, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	// check if error code = 200, then refresh using NewToken func and save in keyring
+	if resp.StatusCode == http.StatusUnauthorized {
+		token, err := auth.NewToken(refreshtoken, config.Current.Google.ClientID, config.Current.Google.ClientSecret)
+		if err != nil {
+			return nil, err
+		}
+		err = keyring.SaveTokens(token.AccessToken, refreshtoken)
+		if err != nil {
+			return nil, err
+		}
+		// if 200 error, after refresh/save, try HTTP again
+		req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+		client = &http.Client{}
+		resp, err = client.Do(req)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+	// check if error code != 200
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Calendar API error: %s", resp.Status)
+	}
+
 	// Parse response
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
