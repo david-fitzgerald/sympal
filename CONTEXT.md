@@ -10,7 +10,7 @@
 
 **The name**: **Sym** = Symbiosis + Simple (complexity under the hood). **PAL** evolves with the project—see [ROADMAP.md](ROADMAP.md) for the full arc.
 
-**Current state**: Implementation in progress (M2 Calendar). M1 Foundation complete. See `foundations/implementation-plan.md` for details.
+**Current state**: Hibernating (other projects taking priority). M1+M2 complete. Resuming ~early April 2026. See `foundations/implementation-plan.md` for details.
 
 **This session, you should**:
 1. Read this file first
@@ -358,7 +358,7 @@ Full details in `foundations/project-context.md`.
 **Phase 2 (Principles)**: Complete — PRINCIPLES.md ratified (v1.1.0)
 **Phase 2.5 (PRD)**: Complete — prd.md v1.0.0 (Ratified)
 **Phase 2.6 (TDD)**: Complete — tdd.md v1.0.3 (Vale + Adversary + Vero reviewed)
-**Phase 3 (Implementation)**: In progress (M2 Calendar). M1 Foundation complete.
+**Phase 3 (Implementation)**: Hibernating (~early April 2026). M1+M2 complete. M3 ready to start on resume.
 
 | Completed Job | Artifact |
 |---------------|----------|
@@ -376,22 +376,15 @@ Full details in `foundations/project-context.md`.
 
 ---
 
-## Current Focus: M3 Planning
+## Current Focus: Hibernating
 
-**M1 Foundation complete.** Todo CRUD, config, logging all working. Dogfooding in progress.
+**Status:** Paused as of 2026-02-21. Other projects taking priority. Resuming ~early April 2026.
+
+**M1 Foundation complete.** Todo CRUD, config, logging all working.
 
 **M2 Calendar complete.** OAuth flow, calendar API, `sympal today` all working.
 
-| Component | Status |
-|-----------|--------|
-| `internal/keyring/` | ✅ Complete — token save/load via system keychain |
-| `internal/config/` | ✅ Complete — GoogleConfig struct added |
-| `internal/auth/google.go` | ✅ Complete — full OAuth flow with token exchange |
-| `internal/calendar/` | ✅ Complete — Google Calendar API client |
-| `sympal auth` | ✅ Complete — triggers OAuth flow |
-| `sympal today` | ✅ Complete — displays today's calendar events |
-
-**Resume point:** M3 planning or M2 polish (see implementation-plan.md)
+**Resume point:** M3 DSL Compilation — ready to start. TDD v1.2.0 finalized. See `foundations/implementation-plan.md`.
 
 **Key references**:
 - `foundations/implementation-plan.md` — Milestone details, learning approach
@@ -429,4 +422,4 @@ When in doubt, PRINCIPLES.md is the authority. Everything else is derivation or 
 
 ---
 
-*Last updated: 2026-01-26 (M2 complete: OAuth flow, calendar API, sympal today all working)*
+*Last updated: 2026-02-21 (Hibernating — M1+M2 complete, resuming ~early April 2026)*

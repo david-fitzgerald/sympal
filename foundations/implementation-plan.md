@@ -2,7 +2,7 @@
 
 **Version:** 1.1.0
 **Date:** 2026-01-27
-**Status:** Active
+**Status:** Hibernating (resuming ~early April 2026)
 **Purpose:** Session-start reference for implementation phase
 **TDD Reference:** foundations/tdd.md v1.2.0
 
@@ -28,9 +28,11 @@
 **M4 Ephemeral Slots:** 🔲 Not started
 **M5 Local LLM + Email:** 🔲 Not started
 
-### Resume Point (2026-01-27)
+### Resume Point (2026-02-21)
 
-**M3 ready to start.** TDD v1.2.0 finalized with all review findings addressed. Implementation plan rebuilt from TDD.
+**Hibernating.** Other projects taking priority. Resuming ~early April 2026.
+
+**When resuming:** M3 DSL Compilation ready to start. TDD v1.2.0 finalized with all review findings addressed. Implementation plan rebuilt from TDD.
 
 ---
 
