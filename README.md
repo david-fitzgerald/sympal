@@ -55,7 +55,7 @@ CLI for privacy-preserving calendar + todo:
 
 ## Status
 
-**Design complete. Implementation starting.**
+**Hibernating until ~early April 2026.** Other projects taking priority.
 
 | Phase | Status |
 |-------|--------|
@@ -63,7 +63,7 @@ CLI for privacy-preserving calendar + todo:
 | Principles | Ratified (v1.1.0) |
 | PRD | Ratified (v1.0.0) |
 | TDD | Final (v1.0.3) |
-| Implementation | **M1 complete, M2 in progress** |
+| Implementation | **M1+M2 complete, M3 next on resume** |
 
 ## Future: Symbiosis
 
