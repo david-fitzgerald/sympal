@@ -11,6 +11,12 @@ updated: 2026-03-01
 
 PRINCIPLES.md is the authority for all design decisions. User writes all code — LLM teaches, not generates. Currently hibernating (M1+M2 complete, resuming ~April 2026).
 
+## Docker
+
+```bash
+~/Dropbox/pg/.docker/run.sh projects/paused/SymPAL
+```
+
 ## Quick Start
 
 1. Read this file
