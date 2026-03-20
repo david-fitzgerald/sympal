@@ -123,6 +123,18 @@ prompts/                  # AI persona architecture
 └── solas-venn/           # Meta-persona for creating personas
 ```
 
+## Development
+
+**Known biases** to watch for in this project:
+
+| Bias | Check |
+|------|-------|
+| Overplanning | "What would we learn by building instead?" |
+| Idealism over pragmatism | GTM instincts are also correct |
+| Learning-as-excuse | Name this conflict when it's happening |
+
+Success criteria: lead dev uses SymPAL daily. No external metrics. No deadline.
+
 ## License
 
 [MIT](LICENSE)
