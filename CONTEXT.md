@@ -2,14 +2,14 @@
 version: 0.3.0
 status: paused
 harness: L0
-updated: 2026-03-01
+updated: 2026-04-20
 ---
 
 # CONTEXT.md — SymPAL Project Context
 
 > **LLM-Agnostic**: This file provides project context for any LLM (Claude, GPT, Gemini, etc.)
 
-PRINCIPLES.md is the authority for all design decisions. User writes all code — LLM teaches, not generates. Currently hibernating (M1+M2 complete, resuming ~April 2026).
+PRINCIPLES.md is the authority for all design decisions. User writes all code — LLM teaches, not generates. Currently hibernating (M1+M2 complete, resuming ~November 2026).
 
 ## Docker
 
