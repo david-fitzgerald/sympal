@@ -725,7 +725,7 @@ Without this, Ephemeral Slots protect privacy but degrade response quality. With
 
 ## Design Consideration: Context vs. Privacy Tradeoff
 
-**The tension:** Persistent context (like CLAUDE.md) makes LLM responses high-quality. But sending rich context exposes preferences, patterns, and domain knowledge — even if Ephemeral Slots protect entity data in queries.
+**The tension:** Persistent context (like AGENTS.md) makes LLM responses high-quality. But sending rich context exposes preferences, patterns, and domain knowledge — even if Ephemeral Slots protect entity data in queries.
 
 ### Context Tiers
 

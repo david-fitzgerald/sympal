@@ -164,7 +164,7 @@ What we are NOT optimizing for in V1:
 | 6 | CLI interface | P0 | CLI daily driver | Medium complexity | Reference: Claude Code; need good UX patterns |
 | 7 | `/today` command | P0 | Calendar-aware planning | Low complexity | Aggregates other features |
 | 8 | Email-to-todo detection | P1 | Email-to-todo | Medium complexity | Requires prompt engineering; false positives risk |
-| 9 | Persistent context | P1 | CLI daily driver | Low complexity | Similar to Claude Code CLAUDE.md approach |
+| 9 | Persistent context | P1 | CLI daily driver | Low complexity | Similar to Claude Code AGENTS.md approach |
 | 10 | Multi-LLM support | P1 | Multiple LLM support | Medium complexity | Abstraction layer; tested across 3 providers |
 | 11 | Local data storage | P0 | Privacy-wrapped integration | Low complexity | SQLite or similar; no cloud dependency |
 

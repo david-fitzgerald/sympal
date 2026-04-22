@@ -96,7 +96,7 @@ If Vale's objection is that anonymization is technically insufficient (de-anonym
 
 **Attack surface:** Primitives-first may be overplanning.
 
-**Challenge:** The lead dev has a known bias toward overplanning (per CLAUDE.md). The team is now recommending more planning artifacts: primitive specs, dependency graphs, architectural constraints documentation.
+**Challenge:** The lead dev has a known bias toward overplanning (per AGENTS.md). The team is now recommending more planning artifacts: primitive specs, dependency graphs, architectural constraints documentation.
 
 What would the team learn by building instead of specifying? The LKG doesn't need a spec—it needs a prototype. Ephemeral Slots don't need a pipeline architecture—they need an implementation attempt.
 
