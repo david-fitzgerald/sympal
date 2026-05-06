@@ -11,6 +11,9 @@ updated: 2026-04-20
 
 PRINCIPLES.md is the authority for all design decisions. User writes all code — LLM teaches, not generates. Currently hibernating (M1+M2 complete, resuming ~November 2026).
 
+## Serves
+- **Primary:** `sales-to-systems/` — human-AI symbiosis platform; build capability + portfolio piece
+
 ## Docker
 
 ```bash
